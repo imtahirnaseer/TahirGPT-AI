@@ -1090,15 +1090,24 @@
 
         }
 
-        /* Floating chat button container */
-        .chat-container {
-            position: fixed;
-            bottom: 2rem;
-            right: 1rem;
-            z-index: 999;
-            top: 590px;
+         .chat-container {
+    position: fixed;
+    top: 590px; /* Default position */
+    right: 2vw; /* Adjusts dynamically */
+    z-index: 999;
+}
 
-        }
+@media (max-height: 1080px) { /* Adjust for smaller screens */
+    .chat-container {
+        top: 80vh; /* Auto-adjust based on viewport height */
+    }
+}
+
+@media (max-height: 720px) {
+    .chat-container {
+        top: 75vh;
+    }
+}
 
         .chat-btn {
             width: 60px;
