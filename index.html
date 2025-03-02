@@ -1090,25 +1090,29 @@
 
         }
 
-         .chat-container {
-    position: fixed;
-    top: 590px; /* Default position */
-    right: 2vw; /* Adjusts dynamically */
-    z-index: 999;
-}
+          .chat-container {
+            position: fixed;
+            top: 590px;
+            /* Default position */
+            right: 0.2vw;
+            /* Adjusts dynamically */
+            z-index: 999;
+        }
 
-@media (max-height: 1080px) { /* Adjust for smaller screens */
-    .chat-container {
-        top: 80vh; /* Auto-adjust based on viewport height */
-    }
-}
+        @media (max-height: 1080px) {
 
-@media (max-height: 720px) {
-    .chat-container {
-        top: 75vh;
-    }
-}
+            /* Adjust for smaller screens */
+            .chat-container {
+                top: 86vh;
+                /* Auto-adjust based on viewport height */
+            }
+        }
 
+        @media (max-height: 720px) {
+            .chat-container {
+                top: 76vh;
+            }
+        }
         .chat-btn {
             width: 60px;
             height: 60px;
