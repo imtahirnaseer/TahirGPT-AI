@@ -1,0 +1,3803 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TahirGPT - Chat</title>
+    <link rel="icon" type="image/jpeg" href="logo.png">
+    <link rel="stylesheet" href="style.css">
+    <script src="script.js"></script>
+
+
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+
+
+
+
+
+    <!-- Custom CSS -->
+    <style>
+        :root {
+            --sidebar-width: 260px;
+        }
+
+        body {
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        body.dark-mode {
+            background-color: #343541;
+            color: #fff;
+        }
+
+        body.dark-mode .card {
+            background-color: transparent !important;
+        }
+
+        body.dark-mode .messages-container .rounded {
+            background-color: #444654 !important;
+            color: #fff;
+        }
+
+        body.dark-mode .markdown-content {
+            color: #fff !important;
+        }
+
+        body.dark-mode .card-footer {
+            background-color: #343541 !important;
+            border-top-color: #444654 !important;
+        }
+
+        body.dark-mode .form-control {
+            background-color: #40414f;
+            border-color: #565869;
+            color: #fff;
+        }
+
+        body.dark-mode .form-control:focus {
+            background-color: #40414f;
+            border-color: #565869;
+            color: #fff;
+            box-shadow: 0 0 0 0.25rem rgba(255, 255, 255, 0.1);
+        }
+
+        body.dark-mode .form-text {
+            color: #8e8ea0 !important;
+        }
+
+        body.dark-mode .btn-primary {
+            background-color: #40414f;
+            border-color: #565869;
+        }
+
+        body.dark-mode .btn-primary:hover {
+            background-color: #4a4b5a;
+            border-color: #666980;
+        }
+
+        body.dark-mode .text-muted {
+            color: #8e8ea0 !important;
+        }
+
+        body.dark-mode .btn-link {
+            color: #fff;
+        }
+
+        body.dark-mode .btn-link:hover {
+            color: #fff;
+        }
+
+        /* Add styles for the new buttons */
+        .text-muted.small {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .text-muted.small .btn-link {
+            padding: 0;
+            margin-left: 8px;
+            color: #6c757d;
+        }
+
+        .text-muted.small .btn-link:hover {
+            color: #495057;
+        }
+
+        .dark-mode .text-muted.small .btn-link {
+            color: #8e8ea0;
+        }
+
+        .dark-mode .text-muted.small .btn-link:hover {
+            color: #adb5bd;
+        }
+
+        /* Sidebar styles */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: var(--sidebar-width);
+            background-color: #202123;
+            color: #fff;
+            transition: transform 0.3s, background-color 0.3s;
+            z-index: 1000;
+        }
+
+        .sidebar.collapsed {
+            transform: translateX(-100%);
+        }
+
+        /* Main content styles */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            min-height: 100vh;
+            transition: margin-left 0.3s;
+            padding-top: 60px;
+        }
+
+        .main-content.expanded {
+            margin-left: 0;
+            padding-top: 60px;
+        }
+
+        /* Top navigation */
+        .top-nav {
+            position: fixed;
+            top: 0;
+            right: 0;
+            left: var(--sidebar-width);
+            height: 60px;
+            background-color: #ffffff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: left 0.3s;
+            z-index: 900;
+        }
+
+        body.dark-mode .top-nav {
+            background-color: #343541;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .top-nav.expanded {
+            left: 0;
+        }
+
+        /* Dark mode toggle */
+        .theme-toggle {
+            width: 51px;
+            height: 31px;
+            background-color: rgb(52, 49, 48);
+            /* Light mode background */
+            border-radius: 31px;
+            padding: 3px;
+            position: relative;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .dark-mode .theme-toggle {
+            background-color: #393a3f;
+            /* Dark mode background */
+        }
+
+        .theme-toggle-circle {
+            width: 25px;
+            height: 25px;
+            background-color: rgb(131, 130, 130);
+            /* Default dark */
+            border-radius: 50%;
+            position: absolute;
+            left: 3px;
+            transition: transform 0.3s, background-color 0.3s;
+        }
+
+        .dark-mode .theme-toggle-circle {
+            transform: translateX(20px);
+            background-color: white;
+            /* White in dark mode */
+        }
+
+
+        /* Chat container adjustments */
+        .chat-container {
+            padding-top: 60px;
+            height: 100vh;
+            max-width: none !important;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .messages-container {
+            height: calc(100vh - 180px);
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: #666 #333;
+        }
+
+        /* Custom scrollbar styles */
+        .messages-container::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .messages-container::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .messages-container::-webkit-scrollbar-thumb {
+            background-color: #666;
+            border-radius: 4px;
+        }
+
+        .messages-container::-webkit-scrollbar-thumb:hover {
+            background-color: #888;
+        }
+
+        /* Dark mode scrollbar */
+        .dark-mode .messages-container::-webkit-scrollbar-thumb {
+            background-color: #444;
+        }
+
+        .dark-mode .messages-container::-webkit-scrollbar-thumb:hover {
+            background-color: #666;
+        }
+
+        /* Sidebar content */
+        .sidebar-header {
+            padding: 15px;
+            border-bottom: 1px solid #4b4c4f;
+        }
+
+        .new-chat-btn {
+            width: 100%;
+            padding: 10px;
+            background-color: transparent;
+            border: 1px solid #4b4c4f;
+            color: #fff;
+            border-radius: 5px;
+            text-align: left;
+            margin-bottom: 15px;
+            transition: background-color 0.3s;
+        }
+
+        .new-chat-btn:hover {
+            background-color: #2d2d2f;
+        }
+
+        .chat-list {
+            overflow-y: auto;
+            height: calc(100vh - 180px);
+        }
+
+        .chat-list-item {
+            padding: 10px 15px;
+            cursor: pointer;
+            color: #fff;
+            text-decoration: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Desktop mode: Hover effect active, delete button hidden by default */
+        @media (min-width: 768px) {
+            .chat-list-item:hover {
+                background-color: #2d2d2f;
+            }
+
+            .chat-list-item .delete-chat-btn {
+                opacity: 0;
+                transition: opacity 0.2s;
+                background: none;
+                border: none;
+                color: #dc3545;
+                padding: 0;
+                margin-left: 8px;
+            }
+
+            .chat-list-item:hover .delete-chat-btn {
+                opacity: 1;
+            }
+        }
+
+        /* Mobile mode: No hover effect and delete button always visible */
+        @media (max-width: 767.98px) {
+            .chat-list-item:hover {
+                background-color: inherit;
+            }
+
+            .chat-list-item .delete-chat-btn {
+                opacity: 1 !important;
+            }
+        }
+
+        body:not(.dark-mode) .chat-list-item .delete-chat-btn {
+            color: #dc3545;
+        }
+
+        body.dark-mode .chat-list-item .delete-chat-btn {
+            color: #ff6b6b;
+        }
+
+        .chat-list-date {
+            padding: 10px 15px;
+            color: #8e8ea0;
+            font-size: 0.8em;
+        }
+
+        /* Dark mode styles */
+        body.dark-mode {
+            background-color: #343541;
+            color: #fff;
+        }
+
+        /* Sidebar styles */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: var(--sidebar-width);
+            background-color: #202123;
+            color: #fff;
+            transition: transform 0.3s, background-color 0.3s;
+            z-index: 1000;
+        }
+
+        .sidebar-header {
+            padding: 15px;
+            border-bottom: 1px solid #4b4c4f;
+        }
+
+        .new-chat-btn {
+            width: 100%;
+            padding: 10px;
+            background-color: transparent;
+            border: 1px solid #4b4c4f;
+            color: #fff;
+            border-radius: 5px;
+            text-align: left;
+            margin-bottom: 15px;
+            transition: background-color 0.3s;
+        }
+
+        .new-chat-btn:hover {
+            background-color: #2d2d2f;
+        }
+
+        /* Light mode sidebar styles */
+        body:not(.dark-mode) .sidebar {
+            background-color: #ffffff;
+            border-right: 1px solid #e5e5e5;
+            color: #000;
+        }
+
+        /* Also, ensure that in light mode, the new-chat-btn links and sidebar text inherit the dark color */
+        body:not(.dark-mode) .sidebar a,
+        body:not(.dark-mode) .sidebar .fw-bold {
+            color: #000;
+        }
+
+        body:not(.dark-mode) .sidebar-header {
+            border-bottom: 1px solid #e5e5e5;
+        }
+
+        body:not(.dark-mode) .new-chat-btn {
+            border: 1px solid #e5e5e5;
+            color: #000;
+        }
+
+        body:not(.dark-mode) .new-chat-btn:hover {
+            background-color: #f8f9fa;
+        }
+
+        body:not(.dark-mode) .chat-list-item {
+            color: #000;
+        }
+
+        body:not(.dark-mode) .chat-list-item:hover {
+            background-color: #f8f9fa;
+        }
+
+        body:not(.dark-mode) .chat-list-date {
+            color: #6c757d;
+        }
+
+        /* Dark mode specific styles */
+        body.dark-mode .sidebar {
+            background-color: #202123;
+        }
+
+        body.dark-mode .new-chat-btn {
+            border-color: #4b4c4f;
+            color: #fff;
+        }
+
+        body.dark-mode .new-chat-btn:hover {
+            background-color: #2d2d2f;
+        }
+
+        body.dark-mode .chat-list-item {
+            color: #fff;
+        }
+
+        body.dark-mode .chat-list-item:hover {
+            background-color: #2d2d2f;
+        }
+
+        body.dark-mode .chat-list-date {
+            color: #8e8ea0;
+        }
+
+        /* Top navigation dark mode */
+        body.dark-mode .btn-link {
+            color: #fff;
+        }
+
+        body.dark-mode #sidebarToggle {
+            color: #fff !important;
+        }
+
+        /* Message styles dark mode */
+        body.dark-mode .messages-container .rounded {
+            background-color: #444654 !important;
+            color: #fff;
+        }
+
+        body.dark-mode .markdown-content {
+            color: #fff !important;
+        }
+
+        body.dark-mode .card-footer {
+            background-color: #343541 !important;
+            border-top-color: #444654 !important;
+        }
+
+        body.dark-mode .form-control {
+            background-color: #40414f;
+            border-color: #565869;
+            color: #fff;
+        }
+
+        body.dark-mode .form-control:focus {
+            background-color: #40414f;
+            border-color: #565869;
+            color: #fff;
+            box-shadow: 0 0 0 0.25rem rgba(255, 255, 255, 0.1);
+        }
+
+        body.dark-mode .form-text {
+            color: #8e8ea0 !important;
+        }
+
+        /* Add navbar brand styles */
+        .navbar-brand span {
+            font-weight: 600;
+            color: #000;
+            font-size: 1.5rem;
+        }
+
+        body.dark-mode .navbar-brand span {
+            color: #fff;
+        }
+
+        /* Adjust main content margin for login page */
+        .main-content.login-page {
+            margin-left: 0;
+        }
+
+        /* Adjust top nav for login page */
+        .top-nav.login-page {
+            left: 0 !important;
+        }
+
+        /* Mobile overlay adjustments */
+        @media (max-width: 768px) {
+            .main-content {
+                margin-left: 0 !important;
+            }
+
+            .top-nav {
+                left: 0 !important;
+            }
+        }
+
+        /* Add styles for the close button */
+        @media (max-width: 768px) {
+            .sidebar-header {
+                padding-right: 10px;
+            }
+
+            #sidebarClose {
+                color: inherit;
+            }
+
+            body.dark-mode #sidebarClose {
+                color: #fff;
+            }
+        }
+
+        @import "~@fortawesome/fontawesome-free/css/all.min.css";
+
+
+        @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css');
+
+        @keyframes zigZagFall {
+            0% {
+                transform: translateX(-10px) translateY(-100vh);
+            }
+
+            25% {
+                transform: translateX(10px) translateY(-75vh);
+            }
+
+            50% {
+                transform: translateX(-10px) translateY(-50vh);
+            }
+
+            75% {
+                transform: translateX(10px) translateY(-25vh);
+            }
+
+            100% {
+                transform: translateX(0px) translateY(0);
+            }
+        }
+
+        @keyframes straighten {
+            0% {
+                transform: rotate(10deg);
+            }
+
+            50% {
+                transform: rotate(-5deg);
+            }
+
+            100% {
+                transform: rotate(0deg);
+            }
+        }
+
+        @keyframes dropMessage {
+            0% {
+                transform: translateY(0);
+                opacity: 0;
+            }
+
+            100% {
+                transform: translateY(20px);
+                opacity: 1;
+            }
+        }
+
+        .alert-rope {
+            position: fixed;
+            top: 50px;
+            left: 40%;
+            transform: translateX(-50%);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 5px;
+            background: rgb(113, 55, 194);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            animation: dropMessage 0.8s ease-out forwards;
+            animation-delay: 2s;
+        }
+
+        /* Rope Styling */
+        .rope {
+            position: absolute;
+            top: -100vh;
+            left: 50%;
+            width: 4px;
+            height: 100px;
+            background: linear-gradient(180deg, #a67c52 0%, #6f4e37 50%, #a67c52 100%);
+            border-radius: 2px;
+            animation: zigZagFall 1.5s ease-out forwards, straighten 0.5s ease-in 1.5s forwards;
+        }
+
+        /* FontAwesome Icon Styling */
+        .alert-icon {
+            margin-right: 10px;
+            font-size: 20px;
+        }
+
+        /* Alert Types */
+        .alert-warning {
+            background-color: #f39c12;
+            /* Orange */
+        }
+
+        .alert-danger {
+            background-color: #e74c3c;
+            /* Red */
+        }
+
+        .alert-success {
+            background-color: #2ecc71;
+            /* Green */
+        }
+
+        .alert-info {
+            background-color: #3498db;
+            /* Blue */
+        }
+
+        /* Pull-Up Animation */
+        .pulled-up {
+            animation: pullUp 1s ease-in forwards;
+        }
+
+        #message-input {
+            overflow: hidden;
+            /* Hides any scrollbar */
+            scrollbar-width: none;
+            /* Firefox: Hide scrollbar */
+            -ms-overflow-style: none;
+            /* IE/Edge: Hide scrollbar */
+        }
+
+        #message-input::-webkit-scrollbar {
+            display: none;
+            /* Chrome, Safari: Hide scrollbar */
+        }
+
+        i.bi {
+            font-family: "Bootstrap Icons" !important;
+            display: inline-block;
+        }
+
+        .bi {
+            font-family: "Bootstrap Icons" !important;
+        }
+    </style>
+
+    <!-- Highlight.js for code syntax highlighting -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css"
+        id="hljs-dark-theme" disabled>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500&display=swap" rel="stylesheet">
+    <!-- Markdown CSS -->
+    <style>
+        /* Welcome Message Styles */
+        .welcome-message {
+            font-family: 'Inter', sans-serif;
+            font-weight: 500;
+            font-size: 2rem;
+            color: #000000;
+            /* Black color for light mode */
+        }
+
+        .dark-mode .welcome-message {
+            color: #ffffff;
+            /* White color for dark mode */
+        }
+
+        .markdown-content {
+            line-height: 1.6;
+        }
+
+        .markdown-content p {
+            margin-bottom: 1rem;
+        }
+
+        .markdown-content pre {
+            background-color: #f6f8fa;
+            border-radius: 6px;
+            padding: 16px;
+            margin: 8px 0;
+        }
+
+        .markdown-content code {
+            background-color: #f6f8fa;
+            padding: 0.2em 0.4em;
+            border-radius: 3px;
+            font-size: 85%;
+        }
+
+        .markdown-content pre code {
+            background-color: transparent;
+            padding: 0;
+        }
+
+        /* Dark mode markdown styles */
+        .dark-mode .markdown-content pre {
+            background-color: #1e1e1e;
+        }
+
+        .dark-mode .markdown-content code {
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+        }
+
+        /* Loading animation styles */
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .typing-indicator span {
+            width: 8px;
+            height: 8px;
+            background-color: #3c6cb4;
+            border-radius: 50%;
+            animation: bounce 1.4s infinite ease-in-out;
+        }
+
+        .dark-mode .typing-indicator span {
+            background-color: #8e8ea0;
+        }
+
+        .typing-indicator span:nth-child(1) {
+            animation-delay: -0.32s;
+        }
+
+        .typing-indicator span:nth-child(2) {
+            animation-delay: -0.16s;
+        }
+
+        @keyframes bounce {
+
+            0%,
+            80%,
+            100% {
+                transform: scale(0);
+            }
+
+            40% {
+                transform: scale(1);
+            }
+        }
+
+        /* Welcome container smooth fade out */
+        #welcome-container {
+            transition: opacity 1s ease-out, transform 1s ease-out;
+        }
+
+        #welcome-container.fade-out {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+
+        /* Update the messages-container styles */
+        .messages-container {
+            height: calc(100vh - 140px);
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: #e0e0e0 transparent;
+        }
+
+        /* Dark mode messages container */
+        .dark-mode .messages-container {
+            scrollbar-color: #444 transparent;
+        }
+
+        /* Custom scrollbar styles */
+        .messages-container::-webkit-scrollbar,
+        .chat-list::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .messages-container::-webkit-scrollbar-track,
+        .chat-list::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .messages-container::-webkit-scrollbar-thumb,
+        .chat-list::-webkit-scrollbar-thumb {
+            background-color: #e0e0e0;
+            border-radius: 4px;
+        }
+
+        .messages-container::-webkit-scrollbar-thumb:hover,
+        .chat-list::-webkit-scrollbar-thumb:hover {
+            background-color: #d0d0d0;
+        }
+
+        /* Dark mode scrollbar */
+        .dark-mode .messages-container::-webkit-scrollbar-thumb,
+        .dark-mode .chat-list::-webkit-scrollbar-thumb {
+            background-color: #444;
+        }
+
+        .dark-mode .messages-container::-webkit-scrollbar-thumb:hover,
+        .dark-mode .chat-list::-webkit-scrollbar-thumb:hover {
+            background-color: #666;
+        }
+
+        /* Mobile-specific adjustments */
+        @media (max-width: 768px) {
+            .messages-container {
+                height: calc(100vh - 120px);
+            }
+
+            .card {
+                height: calc(100vh - 60px) !important;
+            }
+
+            .card-footer {
+                position: sticky;
+                bottom: 0;
+                background-color: var(--bs-body-bg);
+                z-index: 100;
+            }
+        }
+
+        /* New CSS for AI response titles */
+        .ai-response-title {
+            font-size: 0.9rem;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+
+        .dark-mode .ai-response-title {
+            color: #ccc;
+        }
+
+        /* Mobile adjustments for copy feedback */
+        @media (max-width: 768px) {
+            .copy-feedback {
+                font-size: 0.8rem;
+                display: block;
+                margin-top: 4px;
+            }
+        }
+
+        /* Delete button hover effect */
+        .delete-chat-btn {
+            opacity: 0.7;
+            transition: opacity 0.2s ease;
+        }
+
+        .delete-chat-btn:hover {
+            opacity: 1;
+        }
+
+        /* Mobile optimizations for delete modal */
+        @media (max-width: 768px) {
+            .modal-dialog {
+                margin: 1rem;
+            }
+
+            .modal-content {
+                border-radius: 1rem;
+            }
+
+            .modal-body {
+                padding: 1.5rem;
+                text-align: center;
+            }
+
+            .modal-footer {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .modal-footer .btn {
+                width: 100%;
+                padding: 0.75rem;
+            }
+        }
+
+        /* Dark mode support for modal */
+        .dark-mode .modal-content {
+            background-color: #2d2d2d;
+            color: #fff;
+        }
+
+        .dark-mode .modal-header .btn-close {
+            filter: invert(1) grayscale(100%) brightness(200%);
+        }
+
+        .dark-mode .btn-outline-secondary {
+            color: #fff;
+            border-color: #fff;
+        }
+
+        .dark-mode .btn-outline-secondary:hover {
+            background-color: #fff;
+            color: #2d2d2d;
+        }
+
+
+        :root {
+            --light-bg: #ffffff;
+            --light-border: #ddd;
+            --light-text: #333;
+            --light-hover: #f0f0f0;
+
+            --dark-bg: #1e1e1e;
+            --dark-border: #444;
+            --dark-text: #f0f0f0;
+            --dark-hover: #333;
+        }
+
+        body {
+            background-color: var(--light-bg);
+            color: var(--light-text);
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .dark-mode {
+            background-color: var(--dark-bg);
+            color: var(--dark-text);
+        }
+
+        /* Chat List Container */
+        .chat-list {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        /* Chat Item */
+        .chat-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px;
+            border: 1px solid var(--light-border);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        /* 
+.chat-item:hover {
+    background-color: var(--light-hover);
+    transform: scale(1.02);
+} */
+
+        /* Dark Mode Chat Item */
+        .dark-mode .chat-item {
+            border: 1px solid var(--dark-border);
+            background-color: var(--dark-bg);
+        }
+
+        .dark-mode .chat-item:hover {
+            background-color: var(--dark-hover);
+        }
+
+        /* Chat Item Content */
+        .chat-item span {
+            flex: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-weight: 500;
+        }
+
+        /* Chat Buttons (Hidden by Default) */
+        .chat-buttons {
+            display: flex;
+            gap: 5px;
+        }
+
+        .chat-item button {
+            background: transparent;
+            border: none;
+            color: var(--light-text);
+            cursor: pointer;
+            padding: 5px;
+            font-size: 16px;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+        }
+
+        /* Show Buttons on Hover */
+        .chat-item:hover button {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Delete Button */
+        .chat-item .delete-btn {
+            color: #ff5252;
+        }
+
+        .chat-item .delete-btn:hover {
+            color: #e9e4e4;
+        }
+
+        /* Edit Button */
+        .chat-item .edit-btn {
+            color: #4caf50;
+        }
+
+        .chat-item .edit-btn:hover {
+            color: #ecf0ed;
+        }
+
+        /* Dark Mode Buttons */
+        .dark-mode .chat-item button {
+            color: var(--dark-text);
+        }
+
+        .dark-mode .chat-item .delete-btn {
+            color: #ff7777;
+        }
+
+        .dark-mode .chat-item .delete-btn:hover {
+            color: #ff5252;
+        }
+
+        .dark-mode .chat-item .edit-btn {
+            color: #80e27e;
+        }
+
+        .dark-mode .chat-item .edit-btn:hover {
+            color: #849984;
+        }
+
+        /* Chat Messages Box */
+        .chat-messages {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid var(--light-border);
+            padding: 12px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            background-color: var(--light-bg);
+            box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Dark Mode Chat Messages */
+        .dark-mode .chat-messages {
+            border: 1px solid var(--dark-border);
+            background-color: var(--dark-bg);
+        }
+
+        /* Caret Arrow
+.caret {
+    display: inline-block;
+    width: 0;
+    height: 0;
+    border-top: 5px solid transparent;
+    border-bottom: 5px solid transparent;
+    border-right: 5px solid var(--light-text);
+    margin-left: 5px;
+} */
+
+        .dark-mode .caret {
+            border-right-color: var(--dark-text);
+        }
+
+
+
+        /* Basic styling and prevent body scroll */
+        *body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #f8f9fa;
+
+        }
+
+        /* Floating chat button container */
+        .chat-container {
+            position: fixed;
+            bottom: 2rem;
+            right: 1rem;
+            z-index: 999;
+            top: 590px;
+
+        }
+
+        .chat-btn {
+            width: 60px;
+            height: 60px;
+            background: #f8f8f6;
+            border: none;
+            border-radius: 50%;
+            color: #adbb1a;
+            font-size: 1.25rem;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        @keyframes chat-card-appear {
+            0% {
+                transform: translateY(50px) scale(0.8);
+                opacity: 0;
+                filter: blur(10px);
+            }
+
+            40% {
+                transform: translateY(-10px) scale(1.05);
+                opacity: 0.7;
+                filter: blur(2px);
+            }
+
+            70% {
+                transform: translateY(5px) scale(0.98);
+                opacity: 0.9;
+                filter: blur(0);
+            }
+
+            100% {
+                transform: translateY(0) scale(1);
+                opacity: 1;
+                filter: blur(0);
+            }
+        }
+
+        /* Chat card (bot container) */
+        .chat-card {
+            position: fixed;
+            bottom: 80px;
+            right: 2rem;
+            border-radius: 10px;
+            width: 410px;
+            height: 600px;
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+            animation: chat-card-appear 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            /* Theme Variables (default light) */
+            --primary: #2c7be5;
+            --secondary: #f0f2f5;
+            --dark: #212529;
+            --light: #ffffff;
+            --success: #19cf7e;
+            --danger: #ff5555;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            --transition: 0.3s ease;
+            background: var(--light);
+            color: var(--dark);
+            box-shadow: var(--shadow);
+            padding: 5px;
+        }
+
+
+        .chat-card[data-theme="dark"] {
+            --primary: #8ab4f8;
+            --secondary: #3a3a3a;
+            --dark: #e0e0e0;
+            --light: #2d3436;
+            --shadow: 0 4px 15px rgba(255, 255, 255, 0.1);
+            background: var(--light);
+            color: var(--dark);
+        }
+
+        /* Chat header and theme toggle */
+        .chat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid var(--secondary);
+            cursor: pointer;
+        }
+
+        .chat-header h3 {
+            margin: 0;
+            font-size: 1.1rem;
+        }
+
+        .theme-toggle {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--dark);
+            font-size: 1.2rem;
+            transition: var(--transition);
+        }
+
+        /* Feedback form & chat box share vertical space */
+        .feedback-form,
+        .chat-box {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem;
+        }
+
+        .feedback-form h4 {
+            font-size: 0.9rem;
+            font-weight: bold;
+            color: #ffffff;
+            background: linear-gradient(45deg, #734ca2, #352289);
+            padding: 12px 20px;
+            border-radius: 10px;
+            text-align: center;
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+        }
+
+        .feedback-form input,
+        .feedback-form textarea {
+            width: 100%;
+            margin: 0.5rem 0;
+            padding: 0.75rem;
+            border-radius: 6px;
+            border: 1px solid var(--secondary);
+            background: var(--secondary);
+            box-sizing: border-box;
+        }
+
+        .feedback-form textarea {
+            height: 140px;
+            resize: none;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 0.75rem;
+            border: none;
+            border-radius: 24px;
+            background: var(--primary);
+            color: #fff;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 0.75rem;
+            transition: var(--transition);
+        }
+
+        .submit-btn:hover {
+            opacity: 0.9;
+        }
+
+        /* Message container in chat box */
+        .message-container {
+            padding: 0.5rem;
+            overflow-y: auto;
+            height: calc(100% - 100px);
+            scrollbar-width: thin;
+            scrollbar-color: var(--primary) transparent;
+        }
+
+        .message-container::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .message-container::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .message-container::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 4px;
+        }
+
+        /* Welcome message styling */
+        .welcome-message {
+            text-align: center;
+            padding: 20px;
+            color: var(--dark);
+        }
+
+        .welcome-message img {
+            width: 100px;
+            height: 100px;
+            margin-bottom: 10px;
+        }
+
+        .welcome-message h2 {
+            margin: 10px 0 5px;
+            font-size: 1.2rem;
+        }
+
+        .welcome-message p {
+            margin: 0;
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+
+        /* Individual message styling */
+        .message {
+            margin: 1rem 0;
+            animation: fade-in 0.2s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .message-row {
+            display: flex;
+            gap: 0.5rem;
+            align-items: flex-start;
+            width: 100%;
+        }
+
+        .user-msg .message-row {
+            justify-content: flex-end;
+        }
+
+        .bot-msg .message-row {
+            justify-content: flex-start;
+        }
+
+        .msg-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            color: #fff;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .user-msg .msg-avatar {
+            background: var(--primary);
+        }
+
+        .bot-msg .msg-avatar {
+            background: #6c757d;
+        }
+
+        .msg-content {
+            max-width: 70%;
+            background: var(--secondary);
+            color: #fff;
+            border-radius: 5px;
+            padding: 0.75rem;
+            position: relative;
+            word-wrap: break-word;
+        }
+
+        .bot-msg .msg-content {
+            background: var(--secondary);
+            color: var(--dark);
+        }
+
+        .msg-copy-icon {
+            position: absolute;
+            top: 3px;
+            right: 3px;
+            cursor: pointer;
+            font-size: 0.7rem;
+            transition: var(--transition);
+            color: #fff;
+        }
+
+        .bot-msg .msg-copy-icon {
+            color: var(--dark);
+        }
+
+        .msg-copy-icon:hover {
+            color: var(--primary);
+        }
+
+        .msg-icons {
+            display: flex;
+            gap: 0.6rem;
+            margin-top: 0.4rem;
+            font-size: 0.7rem;
+        }
+
+        .msg-icons i {
+            cursor: pointer;
+            color: #fff;
+            transition: var(--transition);
+        }
+
+        .bot-msg .msg-icons i {
+            color: var(--dark);
+        }
+
+        .msg-icons i:hover {
+            color: var(--primary);
+        }
+
+        /* Bottom input area */
+        .input-area {
+            display: flex;
+            gap: 0.5rem;
+            padding: 1rem;
+            border-top: 1px solid var(--secondary);
+            background: var(--light);
+        }
+
+        .input-area input {
+            flex: 1;
+            border: 1px solid var(--secondary);
+            border-radius: 24px;
+            padding: 0.75rem 1rem;
+            background: var(--secondary);
+            box-sizing: border-box;
+        }
+
+        .send-btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 24px;
+            border: none;
+            background: var(--primary);
+            color: #fff;
+            cursor: pointer;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+
+        .send-btn:hover {
+            opacity: 0.9;
+        }
+
+        /* Animations */
+        @keyframes fade-in {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes slide-up {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .chat-card {
+                width: 95%;
+                bottom: 70px;
+                right: 2.5%;
+                height: 85vh;
+            }
+
+            .input-area {
+                flex-direction: column;
+            }
+
+            .send-btn {
+                width: 100%;
+                margin-top: 0.5rem;
+            }
+        }
+    </style>
+
+
+</head>
+
+<body>
+    <!-- Sidebar -->
+
+
+    <div class="sidebar" id="sidebar" style="display: flex; flex-direction: column; justify-content: space-between;">
+        <div class="sidebar-header">
+            <div class="d-flex justify-content-between align-items-center">
+                <a href="#" class="new-chat-btn text-decoration-none" id="newChatBtn">
+                    <i class="bi bi-chat-left-text me-2"></i>New chat
+                </a>
+                <button class="btn btn-link text-muted p-0 d-md-none" id="sidebarClose">
+                    <i class="bi bi-x-lg fs-4"></i>
+                </button>
+            </div>
+        </div>
+        <div class="chat-list">
+
+            <div class="text-muted small px-3 py-2">No chats yet</div>
+
+        </div>
+        <!-- Sidebar Footer: User Details moved from top nav -->
+        <div class="sidebar-footer p-3">
+
+            <div class="d-flex align-items-center">
+
+
+
+                <img src="user.png" alt="Tahir Naseer" class="rounded-circle"
+                    style="width: 40px; height: 40px; object-fit: cover;">
+
+
+                <div class="ms-3">
+                    <div class="fw-bold">Tahir Naseer</div>
+                    <form method="post" action="#" class="mt-1" id="logout-form-sidebar">
+                        <button type="button" class="btn btn-link text-primary p-0 text-decoration-none"
+                            onclick="logout()">Logout</button>
+                    </form>
+                </div>
+
+                <script>
+                    function logout() {
+                        // Perform any necessary logout operations here (e.g., clearing session storage, cookies, etc.)
+                        window.location.href = "https://imtahirnaseer.github.io/Portfolio/";
+                    }
+                </script>
+
+            </div>
+
+        </div>
+    </div>
+
+
+    <!-- Top Navigation -->
+    <div class="top-nav " id="topNav">
+        <div class="d-flex justify-content-between align-items-center px-4 h-100">
+            <div class="d-flex align-items-center">
+
+                <button class="btn btn-link text-dark me-2" id="sidebarToggle">
+                    <i id="sidebarToggleIcon" class="bi fs-4"></i>
+                </button>
+
+                <a class="navbar-brand d-flex align-items-center" href="#" onclick="refreshPage()">
+                    <img src="logo.png" alt="Logo" style="height:40px; margin-right:7px; ">
+                    <span class="me-6">TahirGPT</span>
+                </a>
+
+                <script>
+                    function refreshPage() {
+                        location.reload(); // Reloads the current page
+                    }
+                </script>
+
+                </a>
+            </div>
+            <div class="d-flex align-items-center gap-3">
+                <div class="theme-toggle" id="themeToggle">
+                    <div class="theme-toggle-circle"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content " id="mainContent">
+
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-12 col-md-10 col-lg-8">
+                    <div class="card border-0 h-100">
+                        <!-- Messages Container -->
+                        <div class="messages-container p-3" id="messages">
+                            <div class="d-flex align-items-center justify-content-center h-100" id="welcome-container">
+                                <div class="text-center">
+                                    <img src="logo.png" alt="Logo" style="max-width: 100px;" class="mb-3">
+                                    <h3 class="welcome-message" id="welcome-message"></h3>
+                                    <h2 class="text-muted" style="font-size: 0.9rem;" id="muted-text"></h2>
+                                </div>
+                            </div>
+                        </div>
+
+                        <script>
+                            // Define arrays of messages
+                            const welcomeMessages = [
+                                "How can I assist you today?",
+                                "What’s on your mind?",
+                                "Here to help! What do you need?",
+                                "Ask me anything, I’m ready!",
+                                "Let’s get started! What can I do for you?",
+                                "Need assistance? I'm here to help!",
+                                "What challenge are we tackling today?",
+                                "Let’s make something amazing together!",
+                                "How can I simplify your task today?",
+                                "Here to support! What's your query?",
+                                "Let’s dive into your ideas!",
+                                "Looking for solutions? You’re in the right place!",
+                                "Start typing and let’s figure it out together!",
+                                "Your AI assistant is ready!",
+                                "No problem is too big or small—how can I help?",
+                                "What’s your next big idea?",
+                                "Brainstorming time! Let’s think together.",
+                                "Hello there! What’s on your mind?",
+                                "A new day, a new idea! How can I help?",
+                                "Let’s collaborate on something awesome!",
+                                "What’s the first task of the day?",
+                                "Tell me what you need help with!",
+                                "Ready when you are—how can I assist?",
+                                "Innovation starts with a question—what’s yours?",
+                                "Let’s explore your ideas together!",
+                                "Need insights? I’ve got you covered!",
+                                "I’m here to make your life easier!",
+                                "Solutions are just a question away!",
+                                "Let’s solve this problem together!",
+                                "The journey to success starts now!",
+                                "Let’s bring your vision to life!",
+                                "Your ideas matter—let’s develop them!",
+                                "Let’s work smarter, not harder!",
+                                "Optimized assistance at your service!",
+                                "AI-powered problem-solving starts now!",
+                                "Tell me your goal—I’ll help you get there!",
+                                "Your digital assistant is here to help!",
+                                "You ask, I answer. What’s up?",
+                                "Technology meets creativity—what’s your need?",
+                                "Need answers? Let’s find them!",
+                                "Let’s create something incredible!",
+                                "Your partner in productivity!",
+                                "Let’s simplify complexity together!",
+                                "Need a quick solution? Just ask!",
+                                "Here to streamline your workflow!",
+                                "One step closer to a great solution!",
+                                "Let’s make your work easier!",
+                                "Assisting with efficiency—what’s the task?",
+                                "Always learning, always helping!",
+                                "Excited to assist! What’s the plan?",
+                                "How can I make your day easier?",
+                                "What can we accomplish together today?",
+                                "Need guidance? I’m here!",
+                                "Let’s get things done!",
+                                "Ask away—I’m listening!",
+                                "Your helper is online!",
+                                "Looking for advice? I’ve got you!",
+                                "Time to solve problems!",
+                                "Your productivity booster is here!",
+                                "What’s your goal today?",
+                                "Let’s think, build, and create!",
+                                "How can I add value today?",
+                                "Let’s work on it together!",
+                                "Ready to assist anytime!",
+                                "Let’s turn ideas into action!",
+                                "Tell me what’s on your mind!",
+                                "Time to tackle new challenges!",
+                                "Let’s make progress today!",
+                                "Need recommendations? I can help!",
+                                "What do you need clarity on?",
+                                "Your smart assistant is active!",
+                                "Helping hands, anytime!",
+                                "Got a question? Fire away!",
+                                "Your AI buddy is ready!",
+                                "Let’s boost your efficiency!",
+                                "A question leads to solutions!",
+                                "Let’s make things smoother!",
+                                "Let’s make today productive!",
+                                "What’s today’s priority?",
+                                "Let’s optimize your workflow!",
+                                "Smart solutions, ready for you!",
+                                "How can I ease your task?",
+                                "Here to remove roadblocks!",
+                                "Let’s clear your doubts!",
+                                "Your success is my goal!",
+                                "Let’s accelerate progress!",
+                                "Small tasks or big goals—I’m here!",
+                                "How can I simplify this for you?",
+                                "What’s the next step?",
+                                "Let’s get results together!",
+                                "Let’s bring your project to life!",
+                                "Smart help, at your service!",
+                                "How can I guide you today?",
+                                "You think, I assist!",
+                                "Ideas in mind? Let’s refine them!",
+                                "I’m here to make it easier!",
+                                "Need help deciding? Let’s discuss!",
+                                "Your AI assistant is online!",
+                                "Here to help, 24/7!",
+                                "What’s the plan?",
+                                "I’m ready when you are!",
+                                "Let’s make today productive!"
+                            ];
+
+                            const mutedTexts = [
+                                "We appreciate your feedback. It helps us improve and build a better experience!",
+                                "Your insights help us refine features and make this AI smarter every day.",
+                                "Beta mode is active! Your feedback will help shape the future of this assistant.",
+                                "Tell us how we’re doing. Every suggestion makes this tool better for you!",
+                                "We value your thoughts and ideas. Keep sharing to help us grow!",
+                                "Testing today, improving tomorrow! Your feedback is key to our progress.",
+                                "Your patience and support mean everything. We are always working to improve.",
+                                "Together, we can build a more helpful, efficient, and smart AI assistant.",
+                                "This AI is evolving with you! Your input helps us enhance the experience.",
+                                "Innovation starts with users like you. Help us make this tool even better!",
+                                "Your experience matters! Share your thoughts to help refine this platform.",
+                                "Every message helps us optimize responses and make AI more intuitive.",
+                                "Beta testing is a journey, and we’re grateful you’re part of it!",
+                                "Smarter every day, thanks to your valuable feedback and contributions.",
+                                "Refining AI, step by step. Your insights are helping us improve daily!",
+                                "We listen, we learn, and we improve—all thanks to your suggestions.",
+                                "Your ideas are shaping the next update. Keep them coming!",
+                                "AI that adapts to you! Every suggestion refines our responses.",
+                                "Improving every second with real-world feedback from users like you!",
+                                "Your voice drives progress! Let us know what features you’d love next.",
+                                "A better AI starts with you. Keep sharing your thoughts with us!",
+                                "We are constantly evolving, and your feedback is our guiding force.",
+                                "Each suggestion helps refine how we process and generate responses.",
+                                "Let’s make this the smartest, most helpful assistant with your insights!",
+                                "Building an AI that listens, learns, and improves—with your help!",
+                                "Shaping AI together! Your input is turning ideas into improvements.",
+                                "Your words inspire real updates. Keep sharing, and we’ll keep improving!",
+                                "Beta mode is temporary, but your feedback leads to lasting improvements!",
+                                "Your experience helps us adjust and fine-tune responses in real time.",
+                                "Tell us what works, what doesn’t, and what could be better!",
+                                "AI is learning from every interaction—your input matters a lot!",
+                                "This AI grows smarter with every message and suggestion you provide.",
+                                "We appreciate your support. Together, we’ll create the best AI assistant!",
+                                "Smarter, faster, better—your feedback is driving AI improvements daily.",
+                                "Thanks for testing! Your insights make all the difference in our updates.",
+                                "We’re listening closely. Let’s make this AI assistant work better for you.",
+                                "Your feedback is the foundation of smarter and more useful AI tools.",
+                                "We’re in this together! Keep sharing, and we’ll keep refining features.",
+                                "AI evolves, and your input helps it grow in the right direction!"
+                            ];
+
+                            // Function to select a random message
+                            function getRandomMessage(messages) {
+                                return messages[Math.floor(Math.random() * messages.length)];
+                            }
+
+                            // Set random welcome message and muted text
+                            document.getElementById('welcome-message').textContent = getRandomMessage(welcomeMessages);
+                            document.getElementById('muted-text').textContent = getRandomMessage(mutedTexts);
+                        </script>
+
+                        <!-- Input Form -->
+                        <!-- Chat Footer -->
+                        <div class="card-footer bg-white border-top p-3 mt-auto">
+                            <form id="chat-form" class="mb-0">
+                                <div class="input-group position-relative">
+                                    <textarea id="message-input"
+                                        class="form-control form-control-lg rounded-pill shadow-sm"
+                                        style="height: 30px; max-height: 35px; border: 1px solid #686565; resize: none; overflow: hidden; padding-right: 40px;"
+                                        placeholder="Type your message here..."></textarea>
+
+                                    <!-- Mic Icon -->
+                                    <i id="mic-icon" class="fas fa-microphone position-absolute"
+                                        style="right: 70px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #686565;"></i>
+
+                                    <button type="submit" id="send-button"
+                                        class="btn btn-primary rounded-circle ms-2 align-items-center justify-content-center"
+                                        style="width: 45px; height: 45px; padding: 0;">
+                                        <i class="bi bi-send-fill"></i>
+                                        <i class="bi bi-stop-fill d-none"></i>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <template id="message-template">
+            <div class="mb-3 p-3 rounded bg-light">
+                <div class="d-flex">
+                    <!-- Avatar -->
+                    <div class="flex-shrink-0">
+                        <div class="rounded-circle overflow-hidden d-flex align-items-center justify-content-center"
+                            style="width: 32px; height: 32px;">
+                            <img class="message-avatar" src="logo.png" alt=""
+                                style="width: 100%; height: 100%; object-fit: cover;">
+                        </div>
+                    </div>
+
+                    <div class="ms-3 flex-grow-1">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <!-- Message Content -->
+                            <div class="markdown-content text-dark flex-grow-1"></div>
+
+                            <!-- Copy Button -->
+                            <button onclick="copyMessage(this)" class="btn btn-link text-muted ms-2 p-0"
+                                title="Copy message">
+                                <svg class="bi" width="20" height="20" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg>
+                            </button>
+                        </div>
+
+                        <!-- Timestamp and Icons Section -->
+                        <div class="d-flex justify-content-between align-items-center text-muted small">
+                            <!-- Timestamp dynamically inserted -->
+                            <div id="timestamp" class="text-muted small">Loading...</div>
+
+                            <!-- Action Buttons -->
+                            <div class="d-flex align-items-center ms-2">
+                                <button class="btn btn-link text-muted p-0 me-1" title="Read Aloud">
+                                    <i class="fa fa-volume-up fs-5"></i>
+                                </button>
+                                <button class="btn btn-link text-muted p-0 me-1" title="Like">
+                                    <i class="fa fa-thumbs-up fs-5"></i>
+                                </button>
+                                <button class="btn btn-link text-muted p-0 me-1" title="Dislike">
+                                    <i class="fa fa-thumbs-down fs-5"></i>
+                                </button>
+                                <button class="btn btn-link text-muted p-0" title="Regenerate">
+                                    <i class="fa fa-sync fs-5"></i>
+                                </button>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </template>
+
+        <!-- Include Bootstrap Icons -->
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+
+        <!-- Speech Recognition JS -->
+
+
+        <!-- Loading Template -->
+        <template id="loading-template">
+            <div class="mb-3 p-3 rounded bg-light">
+                <div class="d-flex">
+                    <div class="flex-shrink-0">
+                        <div class="rounded-circle d-flex align-items-center justify-content-center"
+                            style="width: 32px; height: 32px; background-color: #4ba9ad;">
+                            <img src="ailogo.png" alt="AI" style="width: 100%; height: 100%; object-fit: cover;">
+                        </div>
+                    </div>
+                    <div class="ms-3 flex-grow-1">
+                        <div class="typing-indicator">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </template>
+
+        <!-- Delete Confirmation Modal -->
+        <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-labelledby="deleteConfirmModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-0 shadow">
+                    <div class="modal-header border-0">
+                        <h5 class="modal-title" id="deleteConfirmModalLabel">Delete Chat</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        Are you sure you want to delete this chat? This action cannot be undone.
+                    </div>
+                    <div class="modal-footer border-0">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Delete</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="chat-container">
+        <!-- Floating Chat Button -->
+        <button class="chat-btn" onclick="toggleChat()">
+            <i class="fa-solid fa-mug-hot"></i>
+        </button>
+        <!-- Chat Card -->
+        <div class="chat-card" id="chatCard" data-theme="light">
+            <!-- Chat Header with Theme Toggle -->
+            <div class="chat-header" onclick="location.reload()">
+                <h3>TahirGPT-AI-BOT</h3>
+                <button class="theme-toggle" onclick="event.stopPropagation(); toggleTheme()">
+                    <i id="themeIcon" class="fas fa-moon"></i>
+                </button>
+            </div>
+            <!-- Feedback Form -->
+            <div class="feedback-form" id="feedbackForm">
+                <h4>Before starting the chat, please provide your valuable feedback about TahirGPT.</h4>
+                <input type="text" id="name" name="name" placeholder="Name" required />
+                <input type="email" id="email" name="email" placeholder="Email" required />
+                <input type="tel" name="phone" id="phone" placeholder="Phone" required />
+                <textarea id="feedback" name="feedback" placeholder="Feedback type here" required></textarea>
+                <button class="submit-btn" onclick="submitFeedback()">Submit Feedback</button>
+            </div>
+            <!-- Chat Box -->
+            <div class="chat-box" id="chatBox" style="display: none;">
+                <div class="message-container" id="messageContainer"></div>
+                <!-- Bottom Input Area -->
+                <div class="input-area">
+                    <input type="text" id="userInput" placeholder="Type a message..." />
+                    <button class="send-btn" onclick="sendMessage()">Send</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
+    <!-- Bootstrap Icons Library (Include in <head> or before closing <body>) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Speech Recognition JS -->
+
+
+    <!-- Theme Toggle Script -->
+    <script>
+        // Helper function to get CSRF token
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            let timestampElement = document.getElementById("timestamp");
+            let now = new Date();
+            timestampElement.textContent = now.toLocaleTimeString(); // Display current time
+        });
+
+        // Function to delete chat
+        async function deleteChat(chatId, event) {
+            event.preventDefault();
+            event.stopPropagation();
+
+            if (!confirm('Are you sure you want to delete this chat?')) return;
+
+            try {
+                const response = await fetch(`/chat/${chatId}/delete/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': getCookie('csrftoken'),
+                    }
+                });
+
+                if (response.ok) {
+                    // Remove the chat item from the sidebar
+                    const chatItem = event.target.closest('.chat-list-item');
+                    chatItem.remove();
+
+                    // If we're on the deleted chat's page, redirect to new chat
+                    const currentPath = window.location.pathname;
+                    if (currentPath === `/chat/${chatId}/`) {
+                        window.location.href = '/chat/new/';
+                    }
+                } else {
+                    alert('Error deleting chat');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error deleting chat');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const themeToggle = document.getElementById('themeToggle');
+            const body = document.body;
+            const sidebarToggle = document.getElementById('sidebarToggle');
+            const sidebarClose = document.getElementById('sidebarClose');
+            const sidebarToggleIcon = document.getElementById('sidebarToggleIcon');
+            const sidebar = document.getElementById('sidebar');
+            const mainContent = document.getElementById('mainContent');
+            const topNav = document.getElementById('topNav');
+
+            // Load saved theme
+            if (localStorage.getItem('darkMode') === 'true') {
+                body.classList.add('dark-mode');
+            }
+
+            // Theme toggle
+            if (themeToggle) {
+                themeToggle.addEventListener('click', function () {
+                    body.classList.toggle('dark-mode');
+                    localStorage.setItem('darkMode', body.classList.contains('dark-mode'));
+                });
+            }
+
+            function updateSidebarToggleIcon() {
+                if (sidebar.classList.contains('collapsed')) {
+                    sidebarToggleIcon.className = 'bi bi-arrow-right-square fs-4';
+                } else {
+                    sidebarToggleIcon.className = 'bi bi-arrow-left-square fs-4';
+                }
+            }
+
+            function toggleSidebar() {
+                sidebar.classList.toggle('collapsed');
+                mainContent.classList.toggle('expanded');
+                topNav.classList.toggle('expanded');
+                updateSidebarToggleIcon();
+            }
+
+            // Set initial sidebar state based on screen width
+            if (window.innerWidth < 768) {
+                sidebar.classList.add('collapsed');
+                mainContent.classList.add('expanded');
+                topNav.classList.add('expanded');
+            }
+            updateSidebarToggleIcon();
+
+            // Sidebar toggle
+            if (sidebarToggle && sidebar && mainContent && topNav) {
+                sidebarToggle.addEventListener('click', toggleSidebar);
+            }
+
+            // Sidebar close button (mobile only)
+            if (sidebarClose) {
+                sidebarClose.addEventListener('click', toggleSidebar);
+            }
+        });
+    </script>
+
+    <!-- Marked.js for Markdown parsing -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <!-- Highlight.js for code syntax highlighting -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script>
+
+        // Preloaded responses for demo purposes
+        const preloadedData = {
+            "Hello": "How can I assist you today?",
+            "Hey": "Hope you're having a great day!",
+            "Hi": "Nice to see you! How can I help?",
+            "What is TahirGPT?": "TahirGPT is an AI chatbot designed to assist users with various tasks, including answering questions, generating content, and providing AI-based solutions.",
+            "Who created TahirGPT?": "TahirGPT was developed by Tahir Naseer, focusing on AI-powered assistance and automation.",
+            "How does TahirGPT work?": "TahirGPT uses advanced natural language processing (NLP) models to understand and respond to user queries.",
+            "Is TahirGPT free to use?": "Yes, TahirGPT offers free usage with certain limitations. Premium features may be available for advanced users.",
+            "Can I use TahirGPT for coding help?": "Absolutely! TahirGPT can generate, debug, and optimize code in various programming languages.",
+            "Does TahirGPT support multiple languages?": "Yes, TahirGPT supports multiple languages, making it accessible to a global audience.",
+            "Can TahirGPT write articles and blogs?": "Yes, TahirGPT can generate well-structured articles, blogs, and other written content.",
+            "How accurate is TahirGPT?": "TahirGPT aims for high accuracy but may sometimes generate incorrect or outdated information.",
+            "Can I integrate TahirGPT into my website?": "Yes, TahirGPT provides API support for integration into websites and applications.",
+            "What topics can TahirGPT assist with?": "TahirGPT can help with technology, education, business, health, entertainment, and many other topics.",
+            "Can TahirGPT generate code?": "Yes, TahirGPT can generate code in multiple programming languages, including Python, JavaScript, and C++.",
+            "Does TahirGPT provide accurate answers?": "TahirGPT provides highly accurate responses, but always verify critical information.",
+            "Can TahirGPT write articles?": "Yes, TahirGPT can help in writing articles, blogs, and even technical documentation.",
+            "Is TahirGPT available 24/7?": "Yes, you can access TahirGPT anytime.",
+            "Can TahirGPT help with homework?": "Absolutely! TahirGPT can assist with math, science, history, and more.",
+            "Does TahirGPT support multiple languages?": "Yes, TahirGPT can respond in multiple languages including English, Urdu, and Hindi.",
+            "Can I integrate TahirGPT into my website?": "Yes, an API integration is available for developers."
+        };
+
+        let isChatOpen = false;
+        let isDarkMode = false;
+
+        // Toggle chat window open/close
+        function toggleChat() {
+            const chatCard = document.getElementById('chatCard');
+            isChatOpen = !isChatOpen;
+            chatCard.style.display = isChatOpen ? 'flex' : 'none';
+            if (isChatOpen && document.getElementById('chatBox').style.display === 'block') {
+                document.getElementById('userInput').focus();
+            }
+        }
+
+        // Toggle dark/light theme within chat card
+        function toggleTheme() {
+            isDarkMode = !isDarkMode;
+            const chatCard = document.getElementById('chatCard');
+            chatCard.setAttribute('data-theme', isDarkMode ? 'dark' : 'light');
+            const icon = document.getElementById('themeIcon');
+            icon.classList.toggle('fa-moon', !isDarkMode);
+            icon.classList.toggle('fa-sun', isDarkMode);
+        }
+
+        // Show welcome message in the chat box with logo, title and tagline
+        function showWelcomeMessage() {
+            const container = document.getElementById('messageContainer');
+            container.innerHTML = ''; // Clear previous messages if any
+            const welcomeDiv = document.createElement('div');
+            welcomeDiv.classList.add('welcome-message');
+            welcomeDiv.id = 'welcomeMessage';
+            // Replace 'logo.png' with your actual logo path and update the tagline as needed
+            welcomeDiv.innerHTML = `
+        <img src="user.png" alt="Logo" />
+        <h2>I’m here to make it easier!</h2>
+        <p>Together, we can build a more helpful, efficient, and smart AI assistant.</p>
+      `;
+            container.appendChild(welcomeDiv);
+        }
+
+        function submitFeedback() {
+            const nameField = document.getElementById('name');
+            const emailField = document.getElementById('email');
+            const phoneField = document.getElementById('phone');
+            const feedbackField = document.getElementById('feedback');
+            let isValid = true;
+
+            // Regex patterns for validation
+            const nameRegex = /^[A-Za-z\s]{3,}$/;
+            const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+            const phoneRegex = /^(\+91|\+92)?[6789]\d{9}$/;
+            const abusiveWords = ["badword1", "badword2", "badword3"]; // update as needed
+
+            // Function to check empty field
+            function checkEmptyField(field) {
+                if (field.value.trim() === "") {
+                    field.style.border = "2px solid red";
+                    isValid = false;
+                } else {
+                    field.style.border = "";
+                }
+            }
+            checkEmptyField(nameField);
+            checkEmptyField(emailField);
+            checkEmptyField(phoneField);
+            checkEmptyField(feedbackField);
+
+            // Specific validations
+            if (!nameRegex.test(nameField.value.trim())) {
+                nameField.style.border = "2px solid red";
+                isValid = false;
+            }
+            if (!emailRegex.test(emailField.value.trim())) {
+                emailField.style.border = "2px solid red";
+                isValid = false;
+            }
+            if (!phoneRegex.test(phoneField.value.trim())) {
+                phoneField.style.border = "2px solid red";
+                isValid = false;
+            }
+            // Check for abusive words in feedback
+            const feedbackText = feedbackField.value.toLowerCase();
+            abusiveWords.forEach(word => {
+                if (feedbackText.includes(word)) {
+                    feedbackField.style.border = "2px solid red";
+                    isValid = false;
+                }
+            });
+
+            // If valid, hide feedback form and show chat box with welcome message
+            if (isValid) {
+                document.getElementById('feedbackForm').style.display = 'none';
+                document.getElementById('chatBox').style.display = 'block';
+                showWelcomeMessage();
+                document.getElementById('userInput').focus();
+            }
+        }
+
+        // Adding validation error icon next to fields on DOM load
+        document.addEventListener("DOMContentLoaded", function () {
+            document.querySelectorAll("input, textarea").forEach(field => {
+                const dangerIcon = document.createElement("span");
+                dangerIcon.innerHTML = "<i class='fa fa-exclamation-circle' style='color:red;'></i>";
+                dangerIcon.style.display = "none";
+                dangerIcon.style.marginLeft = "5px";
+                field.insertAdjacentElement("afterend", dangerIcon);
+            });
+        });
+
+        // Send message and simulate bot response
+        function sendMessage() {
+            const input = document.getElementById('userInput');
+            const text = input.value.trim();
+            if (!text) return;
+            // Remove welcome message if present
+            const welcomeMsg = document.getElementById('welcomeMessage');
+            if (welcomeMsg) {
+                welcomeMsg.remove();
+            }
+            addMessage('user', text);
+            input.value = '';
+            const botResponse = preloadedData[text] || "Server is busy please try again later";
+            setTimeout(() => {
+                addMessage('bot', botResponse);
+            }, 800);
+        }
+
+        // Append message to chat container
+        function addMessage(sender, text) {
+            const container = document.getElementById('messageContainer');
+            // Ensure welcome message is removed when first message is sent
+            const welcomeMsg = document.getElementById('welcomeMessage');
+            if (welcomeMsg) {
+                welcomeMsg.remove();
+            }
+            const msgDiv = document.createElement('div');
+            msgDiv.classList.add('message', sender === 'user' ? 'user-msg' : 'bot-msg');
+
+            const row = document.createElement('div');
+            row.classList.add('message-row');
+
+            const avatar = document.createElement('div');
+            avatar.classList.add('msg-avatar');
+            avatar.innerHTML = sender === 'user' ? '<i class="fas fa-user"></i>' : '<i class="fas fa-robot"></i>';
+
+            const bubble = document.createElement('div');
+            bubble.classList.add('msg-content');
+            bubble.innerHTML = `
+        <i class="fas fa-copy msg-copy-icon" onclick="copyText(this, \`${text}\`)"></i>
+        <div class="msg-text">${text}</div>
+        <div class="msg-icons">
+          <i class="fas fa-volume-up" onclick="speakIconClick(this, \`${text}\`)"></i>
+          <i class="fas fa-thumbs-up" onclick="likeMessage(this)"></i>
+          <i class="fas fa-thumbs-down" onclick="dislikeMessage(this)"></i>
+          <i class="fas fa-sync" onclick="regenerateMessage()"></i>
+        </div>
+      `;
+
+            if (sender === 'user') {
+                row.appendChild(bubble);
+                row.appendChild(avatar);
+            } else {
+                row.appendChild(avatar);
+                row.appendChild(bubble);
+            }
+            msgDiv.appendChild(row);
+            container.appendChild(msgDiv);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        // Copy message text to clipboard
+        function copyText(icon, text) {
+            navigator.clipboard.writeText(text).then(() => {
+                const original = icon.className;
+                icon.className = 'fas fa-check msg-copy-icon';
+                setTimeout(() => { icon.className = original; }, 2000);
+            });
+        }
+
+        // Handle speak icon for text-to-speech
+        function speakIconClick(icon, text) {
+            if (icon.classList.contains('fa-stop')) {
+                speechSynthesis.cancel();
+                icon.classList.remove('fa-stop');
+                icon.classList.add('fa-volume-up');
+                return;
+            }
+            icon.classList.remove('fa-volume-up');
+            icon.classList.add('fa-stop');
+            const utterance = new SpeechSynthesisUtterance(text);
+            speechSynthesis.speak(utterance);
+            setTimeout(() => {
+                if (icon.classList.contains('fa-stop')) {
+                    speechSynthesis.cancel();
+                    icon.classList.remove('fa-stop');
+                    icon.classList.add('fa-volume-up');
+                }
+            }, 3000);
+        }
+
+        // Like message: change icon color to green
+        function likeMessage(btn) {
+            btn.style.color = 'var(--success)';
+        }
+        // Dislike message: change icon color to red
+        function dislikeMessage(btn) {
+            btn.style.color = 'var(--danger)';
+        }
+        // Regenerate message placeholder (customize as needed)
+        function regenerateMessage() {
+            alert("Regenerate functionality is not implemented.");
+        }
+
+        // Allow sending message on Enter key press
+        document.getElementById('userInput').addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const form = document.getElementById('chat-form');
+            const input = document.getElementById('message-input');
+            const messagesContainer = document.getElementById('messages');
+            const messageTemplate = document.getElementById('message-template');
+            const loadingTemplate = document.getElementById('loading-template');
+
+            // Configure marked.js
+            marked.setOptions({
+                highlight: function (code, lang) {
+                    if (lang && hljs.getLanguage(lang)) {
+                        return hljs.highlight(code, { language: lang }).value;
+                    }
+                    return hljs.highlightAuto(code).value;
+                },
+                breaks: true
+            });
+
+            // Apply markdown and syntax highlighting to existing messages
+            document.querySelectorAll('.markdown-content').forEach(element => {
+                element.innerHTML = marked.parse(element.textContent);
+            });
+
+            // Scroll to bottom of messages
+            function scrollToBottom() {
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }
+            scrollToBottom();
+
+            // Create a new message element
+            function createMessageElement(role) {
+                const template = messageTemplate.content.cloneNode(true);
+                const messageDiv = template.querySelector('.mb-3');
+                const avatar = template.querySelector('.message-avatar');
+                const messageContent = template.querySelector('.markdown-content');
+                const timestamp = template.querySelector('.text-muted.small');
+
+                // Set avatar based on role
+                if (role === 'assistant') {
+                    avatar.src = "ailogo.png";
+                    avatar.alt = "AI";
+                } else {
+                    avatar.src = "user.png";
+                    avatar.alt = "Tahir";
+                }
+
+                // Set timestamp
+                const time = new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+                timestamp.textContent = time;
+
+                return {
+                    element: template,
+                    contentElement: messageContent
+                };
+            }
+
+            // Show loading indicator
+            function showLoadingIndicator() {
+                const template = loadingTemplate.content.cloneNode(true);
+                const loadingDiv = template.querySelector('.mb-3');
+                loadingDiv.id = 'loading-indicator';
+                messagesContainer.appendChild(loadingDiv);
+                scrollToBottom();
+            }
+
+            // Remove loading indicator
+            function removeLoadingIndicator() {
+                const loadingDiv = document.getElementById('loading-indicator');
+                if (loadingDiv) {
+                    loadingDiv.remove();
+                }
+            }
+
+            // Stream text content
+            async function streamText(element, text, speed = 10) {
+                let currentText = '';
+                let buffer = '';
+                let isCode = false;
+                const chars = text.split('');
+
+                // Create a temporary div to parse markdown in chunks
+                const tempDiv = document.createElement('div');
+
+                for (let i = 0; i < chars.length; i++) {
+                    const char = chars[i];
+
+                    // Handle code blocks
+                    if (char === '`') {
+                        if (chars[i + 1] === '`' && chars[i + 2] === '`') {
+                            isCode = !isCode;
+                            buffer += '```';
+                            i += 2;
+                            continue;
+                        }
+                    }
+
+                    buffer += char;
+
+                    // If we're in a code block, wait until we see the closing ```
+                    if (isCode) {
+                        if (buffer.endsWith('```')) {
+                            isCode = false;
+                        }
+                        continue;
+                    }
+
+                    // Process buffer when we hit certain characters or end of text
+                    if (char === ' ' || char === '\n' || i === chars.length - 1) {
+                        currentText += buffer;
+                        tempDiv.innerHTML = marked.parse(currentText);
+                        element.innerHTML = tempDiv.innerHTML;
+                        buffer = '';
+
+                        // Apply syntax highlighting to code blocks
+                        element.querySelectorAll('pre code').forEach((block) => {
+                            hljs.highlightBlock(block);
+                        });
+
+                        scrollToBottom();
+                        await new Promise(resolve => setTimeout(resolve, speed));
+                    }
+                }
+
+                // Process any remaining buffer
+                if (buffer) {
+                    currentText += buffer;
+                    tempDiv.innerHTML = marked.parse(currentText);
+                    element.innerHTML = tempDiv.innerHTML;
+
+                    element.querySelectorAll('pre code').forEach((block) => {
+                        hljs.highlightBlock(block);
+                    });
+
+                    scrollToBottom();
+                }
+            }
+
+            // New function to stream AI response split into three parts with titles
+            async function streamThreePartText(container, fullText, speed = 10) {
+                let text = fullText.trim();
+                if (text.startsWith('"""') && text.endsWith('"""')) {
+                    text = text.slice(3, -3).trim();
+                }
+                const parts = text.split(/\n\s*\n/);
+                if (parts.length !== 3) {
+                    // Fallback: if not exactly 3 parts, stream full text normally
+                    await streamText(container, fullText, speed);
+                    return;
+                }
+                const titles = ["Roman Urdu", "English"];
+                container.innerHTML = '';
+                for (let i = 0; i < 3; i++) {
+                    const section = document.createElement('div');
+                    section.classList.add('ai-response-section', 'mb-3');
+
+                    const titleElem = document.createElement('h6');
+                    titleElem.classList.add('ai-response-title');
+                    titleElem.textContent = titles[i];
+                    section.appendChild(titleElem);
+
+                    const contentElem = document.createElement('div');
+                    contentElem.classList.add('ai-response-content');
+                    section.appendChild(contentElem);
+
+                    container.appendChild(section);
+                    scrollToBottom();
+                    await streamText(contentElem, parts[i], speed);
+                }
+            }
+
+            // Preloaded data
+            const preloadedData = {
+                "Hello": "How can I assist you today?",
+                "Hey": "Hope you're having a great day!",
+                "Hi": "Nice to see you! How can I help?",
+                "Greetings": "Wishing you a wonderful day ahead!",
+                "Good morning": "Good morning! How can I support you?",
+                "Good afternoon": "Good afternoon! Need any assistance?",
+                "Good evening": "Good evening! How’s everything going?",
+                "Howdy": "How’s it going? How can I assist?",
+                "Yo": "Hey there! What’s up?",
+                "Hi there": "I hope you're doing well! How can I help?",
+                "Hey there": "Glad to see you! How can I assist?",
+                "What's up": "Not much! How about you?",
+                "Sup": "Kya haal hain? Need any help?",
+                "Hola": "Namaskar! How can I be of service?",
+                "Bonjour": "Swagat hai! What brings you here today?",
+                "Ciao": "Aap kese hain? Tell me how I can help.",
+                "Namaste": "Namaste! Aapko kisi tarah ki madad chahiye?",
+                "Salutations": "Sat Sri Akal! How may I assist?",
+                "Shalom": "Aapka din mangalmay ho! How can I help?",
+                "As-salamu alaykum": "Wa Alaikum Assalam! Kaise madad kar sakta hoon?",
+                "Asslamalaikum": "Wa Alaikum Assalam! Kaise madad kar sakta hoon?",
+                "Marhaba": "Aapka swagat hai! Need any help?",
+                "Konnichiwa": "Aap kese hain? How can I support?",
+                "Annyeong": "Shubh din! Koi help chahiye?",
+                "Zdravstvuyte": "Jai Hind! How can I assist you?",
+                "Hallo": "Aapko kisi madad ki zaroorat hai?",
+                "Selam": "Shubh din ho aapka! How can I help?",
+                "Hej": "Namaskaram! Kya madad chahiye?",
+                "Oi": "Kaise ho doston? Kuch madad chahiye?",
+                "Aloha": "Swasth raho, mast raho! How can I assist?",
+                "G'day": "Aapke din ki shubhkamnayein! Need any help?",
+                "Buna": "Shubh prabhat! Kya kar sakta hoon aapke liye?",
+                "Merhaba": "Kaise ho mitron? How can I help?",
+                "Ahoy": "Bolo doston! Kya help kar sakta hoon?",
+                "Wassup": "Sab badhiya? Batao kaise help kar sakta hoon?",
+                "Yo yo": "Mast raho! Koi kaam ho to batao.",
+                "Holla": "Shanti aur sukh mile aapko! How can I assist?",
+                "Hello there": "Aapko aaj ka din mubarak ho! How can I support?",
+                "Peace": "Shaanti ho! What assistance do you need?",
+                "Hey buddy": "Kya haal hain? Kuch kaam ho to batao!",
+                "Hey friend": "Mitra, kya help chahiye aapko?",
+                "Hey mate": "Dost, batao kaise madad kar sakta hoon?",
+                "Hi buddy": "Swasth aur sukhi raho! Need any assistance?",
+                "Hi friend": "How can I support you?",
+                "Hey pal": "Dosto ke liye humesha tayar! Batao kya chahiye?",
+                "Hey bro": "Bhai, kaise ho? Kuch help chahiye?",
+                "Hey sis": "Behan ji, koi madad chahiye?",
+                "Hey dude": "Dude, kya haal hain? Need any help?",
+                "Hey champ": "Champion, kya kar sakta hoon aapke liye?",
+                "Hey boss": "Batao boss, kaise madad kar sakta hoon?",
+                "Hey boss": "Are you working on something exciting?",
+                "Hey legend": "What’s the last thing that made you laugh?",
+                "Hey superstar": "What’s the most interesting thing you’ve seen today?",
+                "Hey rockstar": "Are you feeling inspired today?",
+                "Hey genius": "What’s a goal you’re working on right now?",
+                "Hello sunshine": "Are you feeling bright and cheerful today?",
+                "Hey explorer": "Have you discovered anything new lately?",
+                "Hey warrior": "What challenge are you tackling today?",
+                "Hey dreamer": "What’s something you’re excited about?",
+                "Hey thinker": "What’s on your mind these days?",
+                "Hey learner": "What’s the last book or article you read?",
+                "Hey go-getter": "What’s a small win you had today?",
+                "Hey hustler": "Are you feeling productive today?",
+                "Hey creator": "What’s the last creative thing you worked on?",
+                "Hey adventurer": "If you could travel anywhere today, where would it be?",
+                "Hey storyteller": "Got any interesting stories to share?",
+                "Hey leader": "What’s the best advice you’ve received lately?",
+                "Hey strategist": "What’s your plan for the day?",
+                "Hey innovator": "Have you come up with any new ideas today?",
+                "Hey champion": "What’s something you’re proud of today?",
+                "Hey motivator": "What’s something positive you can share today?",
+                "Hey thinker": "What’s a deep thought you had recently?",
+                "Hey philosopher": "If you could change one thing about today, what would it be?",
+                "Hey genius": "What’s a fun fact you learned recently?",
+                "Hey builder": "Are you working on any cool projects?",
+                "Hey explorer": "What’s a new skill you’d love to learn?",
+                "Hey achiever": "What’s one thing you’ve accomplished today?",
+                "Hey friend": "How can I support you today?",
+                "Hey superstar": "What’s one goal you want to achieve this week?",
+                "Hey energetic soul": "Are you feeling pumped up today?",
+                "Hey kind heart": "Have you done a random act of kindness lately?",
+                "Hey bright mind": "What’s one thing that made you think today?",
+                "Hey joyful spirit": "Are you spreading positivity today?",
+                "Hey smiling face": "What’s something that made you happy today?",
+                "Hey brave soul": "How are you pushing yourself out of your comfort zone?",
+                "Hey creative soul": "What’s an artistic project you’re working on?",
+                "Hey mindful one": "Have you taken a deep breath and relaxed today?",
+                "Hey go-getter": "Are you staying focused on your goals?",
+                "Hey explorer": "If you could visit any place right now, where would it be?",
+                "Hey fun-lover": "What’s the most fun thing you’ve done this week?",
+                "Hey deep thinker": "What’s a thought-provoking idea you’ve come across?",
+                "Hey team player": "How’s your teamwork going lately?",
+                "Hey visionary": "What’s your dream for the future?",
+                "Hey strategist": "What’s a smart move you made today?",
+                "Hey peace seeker": "Have you found a moment of calm today?",
+                "Hey leader": "What’s a decision you’ve made recently?",
+                "Hey star": "What’s shining bright in your life right now?",
+                "Hey sunshine": "What’s something beautiful you noticed today?",
+                "Hey kind soul": "How have you spread kindness today?",
+                "Hey rockstar": "What song is stuck in your head right now?",
+                "Hey adventurer": "What’s the next adventure on your list?",
+                "Hey buddy": "Need a friendly chat?",
+                "Hey champion": "What’s a challenge you’ve overcome recently?",
+                "Hey awesome human": "How are you staying awesome today?",
+                "Hey brilliant mind": "What’s an idea you’ve been thinking about?",
+                "Hey unstoppable force": "What’s something you’re not giving up on?",
+                "Hey happy soul": "What’s something that brings you joy?",
+                "Hey inspiration": "How have you inspired someone lately?",
+                "Who is Dawood Hussain": "Dawood Hussain is a lateral entry student at Baba Ghulam Shah Badshah University, pursuing a degree in Information Technology Engineering (ITE) from 2024 to 2027. With a strong interest in technology and problem-solving, he is dedicated to expanding his knowledge and skills in the IT field. His journey through lateral entry reflects his determination and passion for engineering. For more insights into his academic and professional growth, you can explore his LinkedIn profile.",
+                "Who is Owais Chouhan": "Owais Chouhan is a dedicated individual currently pursuing his degree at Baba Ghulam Shah Badshah University in Jammu. He is committed to his academic growth and is actively engaged in his studies. Owais is also a first-degree connection, indicating a direct professional relationship. For more detailed information about his academic background and professional interests, you can visit his LinkedIn profile.",
+                "Who is imtahirnaseer": "imtahirnaseer is Tahir Naseer and he is a self-taught developer from Rajouri, Jammu & Kashmir, currently pursuing a degree in Computer Science Engineering at Baba Ghulam Shah Badshah University (BGSBU). He started his tech journey with a Computer Diploma in 2021 while completing his 11th-grade studies. Initially enrolled in a Physics degree, he later transitioned to Computer Science in 2023. Alongside his studies, he works as a freelancer in web development and mini-projects to support his family financially",
+                "What is artificial intelligence?": "Artificial intelligence (AI) is the simulation of human intelligence in machines that can learn and make decisions.",
+                "What is the meaning of life?": "The meaning of life is subjective, often associated with happiness, purpose, and relationships.",
+                "What are the benefits of meditation?": "Meditation helps reduce stress, improve focus, and promote mental well-being.",
+                "What is the best programming language to learn?": "It depends on your goals. Python is great for beginners, JavaScript for web development, and C++ for systems programming.",
+                "What is the difference between HTTP and HTTPS?": "HTTPS is a secure version of HTTP that encrypts data for safer browsing.",
+                "What are the symptoms of depression?": "Common symptoms include persistent sadness, loss of interest, fatigue, and changes in sleep or appetite.",
+                "What is blockchain technology?": "Blockchain is a decentralized digital ledger used to record transactions securely.",
+                "What is an API?": "An API (Application Programming Interface) allows different software applications to communicate with each other.",
+                "What are the different types of investments?": "Stocks, bonds, real estate, mutual funds, and cryptocurrencies are common investment options.",
+                "What is the importance of education?": "Education helps individuals gain knowledge, develop skills, and improve their quality of life.",
+
+                "Where can I learn coding for free?": "Platforms like Codecademy, freeCodeCamp, and W3Schools offer free coding lessons.",
+                "Where is the Eiffel Tower located?": "The Eiffel Tower is located in Paris, France.",
+                "Where can I find remote jobs?": "Websites like LinkedIn, Upwork, and FlexJobs list remote job opportunities.",
+                "Where do most people travel for vacations?": "Popular destinations include Europe, Bali, Japan, and the Maldives.",
+                "Where can I buy cryptocurrency?": "You can buy cryptocurrency from platforms like Binance, Coinbase, and Kraken.",
+                "Where do I check my internet speed?": "You can check your speed on websites like Speedtest.net or Fast.com.",
+                "Where does the sun rise?": "The sun rises in the east and sets in the west.",
+                "Where is the best place to study?": "A quiet, well-lit environment with minimal distractions is ideal for studying.",
+                "Where can I find reliable news sources?": "Reputable sources include BBC, The New York Times, and Al Jazeera.",
+                "Where do I report a cybercrime?": "You can report cybercrimes to local authorities or cybersecurity organizations like the FBI Cyber Crime Division.",
+
+                "Who invented the telephone?": "Alexander Graham Bell is credited with inventing the telephone in 1876.",
+                "Who is the richest person in the world?": "Let me check the latest rankings for you.",
+                "Who wrote the Harry Potter series?": "J.K. Rowling wrote the Harry Potter series.",
+                "Who was the first person to walk on the moon?": "Neil Armstrong was the first person to walk on the moon in 1969.",
+                "Who discovered gravity?": "Sir Isaac Newton discovered the concept of gravity.",
+                "Who founded Microsoft?": "Bill Gates and Paul Allen founded Microsoft in 1975.",
+                "Who painted the Mona Lisa?": "Leonardo da Vinci painted the Mona Lisa.",
+                "Who is the fastest runner in the world?": "Usain Bolt holds the record for the fastest 100m sprint.",
+                "Who is known as the father of computers?": "Charles Babbage is known as the father of computers.",
+                "Who was the first President of the United States?": "George Washington was the first President of the United States.",
+
+                "When was the internet invented?": "The internet was developed in the late 1960s and became widely used in the 1990s.",
+                "When should I drink water?": "Drinking water regularly throughout the day helps keep you hydrated.",
+                "When is the best time to exercise?": "Morning workouts can boost energy, while evening workouts can relieve stress.",
+                "When does summer start?": "Summer usually starts around June 21 in the Northern Hemisphere.",
+                "When should I sleep for better health?": "Sleeping between 10 PM and 6 AM is ideal for maintaining a healthy sleep cycle.",
+                "When was electricity discovered?": "Electricity was discovered in the 18th century, with Benjamin Franklin conducting early experiments.",
+                "When is the next solar eclipse?": "Let me check the latest information for you.",
+                "When was Google founded?": "Google was founded in 1998 by Larry Page and Sergey Brin.",
+                "When is the best time to plant trees?": "The best time to plant trees is during spring or autumn.",
+                "When was the first iPhone released?": "The first iPhone was released in 2007.",
+
+                "How do I start a blog?": "Choose a niche, create a website, and start writing content regularly.",
+                "How can I lose weight quickly?": "A healthy diet, regular exercise, and proper hydration can help with weight loss.",
+                "How do I learn a new language?": "Consistent practice, language apps, and immersion can help you learn faster.",
+                "How can I improve my memory?": "Brain exercises, a balanced diet, and adequate sleep can enhance memory.",
+                "How do I start investing?": "Begin with research, open a brokerage account, and start with small investments.",
+                "How does a car engine work?": "A car engine converts fuel into energy to power the vehicle.",
+                "How do I become successful?": "Hard work, persistence, and continuous learning contribute to success.",
+                "How does WiFi work?": "WiFi uses radio waves to transmit internet signals between devices.",
+                "How can I boost my immune system?": "A healthy diet, exercise, and sufficient sleep help strengthen immunity.",
+                "How do I increase productivity?": "Time management, setting goals, and eliminating distractions improve productivity.",
+
+
+                "What is TahirGPT?": "TahirGPT is an AI-powered chatbot developed by Tahir Naseer. It provides information, answers questions, and assists with various tasks.",
+
+                "Why is the sky blue?": "The sky appears blue due to the scattering of sunlight by Earth's atmosphere.",
+                "Why do we dream?": "Dreams help process emotions, memories, and subconscious thoughts.",
+                "Why is exercise important?": "Exercise improves physical health, mental well-being, and overall fitness.",
+                "Why do cats purr?": "Cats purr as a way to communicate, express contentment, or soothe themselves.",
+                "Why do people yawn?": "Yawning helps regulate brain temperature and increase oxygen intake.",
+                "Why is drinking water important?": "Water is essential for hydration, digestion, and overall health.",
+                "Why do we need sleep?": "Sleep allows the body and brain to rest, recover, and function properly.",
+                "Why is recycling important?": "Recycling reduces waste, conserves resources, and helps the environment.",
+                "Why do people get hiccups?": "Hiccups are caused by involuntary contractions of the diaphragm.",
+                "Why do leaves change color in autumn?": "Leaves change color due to a decrease in chlorophyll production in cooler temperatures.",
+                "What is ChatGPT?": "ChatGPT is an AI-powered chatbot that provides information, answers questions, and assists with various tasks.",
+                "How do you work?": "I use artificial intelligence and machine learning to understand and respond to text-based queries.",
+                "Who created you?": "I was developed by OpenAI, a research organization dedicated to advancing AI technology.",
+                "Can you write code?": "Yes, I can generate code in multiple programming languages like Python, JavaScript, and more.",
+                "Can you help with homework?": "Yes! I can assist with explanations, examples, and study tips.",
+                "What is the capital of India?": "The capital of India is New Delhi.",
+                "What is the weather today?": "I can check that for you. Please provide your location.",
+                "How do I lose weight?": "A healthy diet, regular exercise, and staying hydrated can help with weight loss.",
+                "What are some good movies to watch?": "It depends on your taste! Do you prefer action, comedy, drama, or sci-fi?",
+                "Who is the President of the USA?": "Let me check the latest information for you.",
+                "What is 2+2?": "2+2 equals 4!",
+                "How do I make money online?": "You can explore freelancing, e-commerce, blogging, and many other options.",
+                "What is AI?": "AI, or Artificial Intelligence, refers to the simulation of human intelligence in machines.",
+                "How do I start a business?": "You need a business plan, market research, and funding to start.",
+                "Can you tell me a joke?": "Sure! Why don’t skeletons fight each other? Because they don’t have the guts!",
+                "What is the meaning of life?": "That’s a deep question! Many believe it’s about happiness, growth, and purpose.",
+                "How do I learn coding?": "Start with beginner-friendly languages like Python and practice consistently.",
+                "What are some healthy foods?": "Fruits, vegetables, whole grains, lean protein, and nuts are great choices!",
+                "What is Bitcoin?": "Bitcoin is a decentralized digital currency that operates on blockchain technology.",
+                "How do I improve my English?": "Reading, writing, and speaking regularly will help improve your English skills.",
+                "What’s the latest news?": "Let me check the latest headlines for you.",
+                "How do I stay motivated?": "Set goals, stay positive, and surround yourself with inspiration.",
+                "What is HTML?": "HTML (HyperText Markup Language) is the standard language for creating web pages.",
+                "How do I meditate?": "Find a quiet place, focus on your breath, and clear your mind.",
+                "What are some fun hobbies?": "Reading, painting, gaming, cooking, and photography are great hobbies.",
+                "How do I cook pasta?": "Boil water, add pasta, cook until soft, then drain and add sauce!",
+                "What are the symptoms of flu?": "Common symptoms include fever, cough, sore throat, and body aches.",
+                "How do I get rid of stress?": "Exercise, meditation, and deep breathing can help reduce stress.",
+                "What is quantum physics?": "Quantum physics is the study of the behavior of matter and energy on a tiny scale.",
+                "What is the best phone right now?": "Let me check the latest smartphone rankings for you.",
+                "What is the fastest way to learn a language?": "Immersion, daily practice, and using apps like Duolingo can help.",
+                "How do I boost my confidence?": "Positive self-talk, practice, and setting small goals can help build confidence.",
+                "What are some productivity tips?": "Prioritize tasks, take breaks, and use tools like to-do lists.",
+                "How can I become a millionaire?": "Smart investing, saving, and entrepreneurship can help build wealth.",
+                "Can you do math problems?": "Yes, I can solve math problems! Just ask me one.",
+                "How do I sleep better?": "Maintain a regular sleep schedule and avoid screens before bed.",
+                "What is an NFT?": "NFTs (Non-Fungible Tokens) are unique digital assets stored on the blockchain.",
+                "What is cloud computing?": "Cloud computing is the delivery of computing services over the internet.",
+                "How do I invest in stocks?": "You can start by researching companies, using brokerage apps, and diversifying your portfolio.",
+                "What are some good exercise routines?": "Try cardio, strength training, or yoga based on your fitness goals.",
+                "What’s the best way to save money?": "Create a budget, track expenses, and reduce unnecessary spending.",
+                "What is a VPN?": "A VPN (Virtual Private Network) secures your internet connection and protects your privacy.",
+                "What is cybersecurity?": "Cybersecurity is the practice of protecting systems and data from cyber threats.",
+                "What are the best travel destinations?": "Popular spots include Paris, Bali, Tokyo, and the Maldives!",
+                "How do I get better at public speaking?": "Practice, confidence, and preparation are key to improving public speaking skills.",
+                "How do I stay happy?": "Surround yourself with positivity, practice gratitude, and do what you love!",
+                "What is your name": "I am TahirGPT, an AI chatbot created by Tahir Naseer.",
+                "What is TahirGPT": "TahirGPT is an AI chatbot developed by Tahir Naseer.",
+                "Who is Tahir Naseer": "Tahir Naseer is a passionate software engineer and cybersecurity professional based in India. He actively works on several coding projects and has showcased his work on GitHub. His repositories include projects like a Tic-Tac-Toe game, Scientific Calculator,Password Generator,Tube Light, a Snake Game & Owner of TahirGPT AI Chatbot and engaging in learning activities related to coding and problem-solving, where he implements interactive features using HTML, CSS, and JavaScript, C, C++, Python, C#, Java and Git.He is currently enhancing his skills in Data Structures and Algorithms with C, as well as object-oriented programming using C++",
+                "What degree are you pursuing, Tahir?": "Tahir is pursuing a Computer Science Engineering degree at Baba Ghulam Shah Badshah University (BGSBU).",
+                "Which university are you studying at?": "Tahir is studying at Baba Ghulam Shah Badshah University (BGSBU).",
+                "What is your field of study, Tahir?": "Tahir is studying Computer Science Engineering.",
+                "When did you start your degree program?": "Tahir started his Computer Science Engineering degree in 2023.",
+                "When will you complete your degree?": "Tahir will complete his degree in 2027.",
+                "What is the duration of your degree program?": "The duration of Tahir's degree program is 4 years, from 2023 to 2027.",
+                "What is your major?": "Tahir's major is Computer Science Engineering.",
+                "Why did you choose Computer Science Engineering?": "Tahir chose Computer Science Engineering because of his strong interest in technology, coding, and problem-solving.",
+                "What is your favorite programming language?": "Tahir enjoys working with JavaScript, Python, and C++.",
+                "What do you plan to do after completing your degree?": "After completing his degree, Tahir plans to pursue a career in software development or AI/ML.",
+                "What are your career aspirations, Tahir?": "Tahir's career aspiration is to work in the field of software development and contribute to innovative technologies.",
+                "What are your hobbies, Tahir?": "Tahir's hobbies include coding, reading tech blogs, and exploring emerging technologies.",
+                "What are you most excited about in your degree?": "Tahir is most excited about learning advanced programming techniques and understanding AI and machine learning.",
+                "How do you spend your free time, Tahir?": "Tahir spends his free time coding, reading about new technologies, and watching tech tutorials.",
+                "What motivates you to pursue a career in Computer Science?": "Tahir is motivated by the potential of technology to solve real-world problems and make a positive impact on society.",
+                "What project are you working on, Tahir?": "Tahir is working on a biometric attendance system for students at Baba Ghulam Shah Badshah University.",
+                "What skills are you developing during your degree?": "During his degree, Tahir is developing skills in software development, AI, machine learning, and data structures.",
+                "What are your goals during your time at BGSBU?": "Tahir's goals are to gain deep knowledge in Computer Science, work on real-world projects, and build a solid foundation for his future career.",
+                "What do you want to achieve by the end of your degree?": "By the end of his degree, Tahir aims to have a strong portfolio of projects and a deep understanding of computer science concepts to kickstart his professional career.",
+
+                "What is JavaScript": "JavaScript is a programming language for interactive web development.",
+                "What is ChatGPT": "ChatGPT is an AI chatbot developed by OpenAI.",
+                "What is JavaScript": "JavaScript is a programming language for interactive web development.",
+                "What is HTML": "HTML stands for HyperText Markup Language, used to structure web pages.",
+                "What is CSS": "CSS stands for Cascading Style Sheets and is used to style HTML content.",
+                "What is AI": "AI stands for Artificial Intelligence, which simulates human intelligence in machines.",
+                "What is Python": "Python is a high-level programming language known for its simplicity and versatility.",
+                "What is an API": "API stands for Application Programming Interface, a set of functions for software communication.",
+                "What is a database": "A database is an organized collection of data for easy access, management, and storage.",
+                "What is a cloud service?": "Cloud services provide computing resources over the internet.",
+                "What is an algorithm?": "An algorithm is a set of instructions for solving problems or performing tasks.",
+                "What is cybersecurity?": "Cybersecurity is the practice of protecting systems and data from digital threats.",
+                "What is encryption?": "Encryption is a method to secure data by converting it into unreadable formats.",
+                "What is machine learning?": "Machine learning is a subset of AI where computers learn from data without explicit programming.",
+                "What is deep learning?": "Deep learning is a type of machine learning using neural networks for complex data analysis.",
+                "What is the Internet of Things (IoT)?": "IoT refers to interconnected devices that communicate over the internet.",
+                "What is blockchain?": "Blockchain is a decentralized digital ledger technology used for secure data recording.",
+                "What is Bitcoin?": "Bitcoin is a cryptocurrency based on blockchain technology.",
+                "What is a programming language?": "A programming language is a formal way to communicate instructions to a computer.",
+                "What is Git?": "Git is a version control system to track code changes and collaborate on software projects.",
+                "What is GitHub?": "GitHub is a platform for hosting, version control, and collaboration using Git.",
+                "What is an IDE?": "IDE stands for Integrated Development Environment, a tool for software development.",
+                "What is a compiler?": "A compiler translates source code into machine-readable instructions.",
+                "What is open-source software?": "Open-source software has source code available for public modification and sharing.",
+                "What is an operating system?": "An operating system is software that manages computer hardware and software resources.",
+                "What is Linux?": "Linux is an open-source operating system known for its stability and security.",
+                "What is Windows?": "Windows is a series of operating systems developed by Microsoft.",
+                "What is macOS?": "macOS is the operating system developed by Apple for Mac computers.",
+                "What is HTTP?": "HTTP stands for HyperText Transfer Protocol, used for transferring web data.",
+                "What is HTTPS?": "HTTPS is the secure version of HTTP, using encryption to protect data.",
+                "What is a URL?": "A URL (Uniform Resource Locator) specifies the address of a resource on the internet.",
+                "What is a domain name?": "A domain name is a human-readable address for accessing websites.",
+                "What is a browser?": "A browser is software for accessing and viewing websites.",
+                "What is Google Chrome?": "Google Chrome is a fast and popular web browser developed by Google.",
+                "What is Edge?": "Microsoft Edge is a browser developed by Microsoft as the successor to Internet Explorer.",
+                "What is Safari?": "Safari is Apple's web browser for macOS and iOS devices.",
+                "What is email?": "Email is an electronic way to send messages over the internet.",
+                "What is cloud computing?": "Cloud computing delivers on-demand computing services over the internet.",
+                "What is virtual reality?": "Virtual reality is a simulated experience created using computer technology.",
+                "What is augmented reality?": "Augmented reality overlays digital elements on the real world.",
+                "What is 5G?": "5G is the fifth-generation wireless technology for faster mobile networks.",
+                "What is a server?": "A server is a computer system that provides services to other computers on a network.",
+                "What is a client?": "A client is a computer that accesses services provided by a server.",
+                "What is a firewall?": "A firewall is a network security system that monitors and controls incoming and outgoing traffic.",
+                "What is a router?": "A router directs data packets between computer networks.",
+                "What is Wi-Fi?": "Wi-Fi is a wireless networking technology that allows devices to connect to the internet.",
+                "What is Bluetooth?": "Bluetooth is a wireless technology for exchanging data over short distances.",
+                "What is a QR code?": "A QR code is a two-dimensional barcode that stores information.",
+                "What is a chatbot?": "A chatbot is a software application that simulates human conversation.",
+                "What is SaaS?": "SaaS stands for Software as a Service, software delivered via the internet.",
+                "What is PaaS?": "PaaS stands for Platform as a Service, providing a platform for software development.",
+                "What is IaaS?": "IaaS stands for Infrastructure as a Service, offering virtualized computing resources online.",
+                "What is Kubernetes?": "Kubernetes is an open-source platform for managing containerized applications.",
+                "What is Docker?": "Docker is a tool for creating and managing application containers.",
+                "What is virtualization?": "Virtualization creates virtual versions of physical resources like servers or storage.",
+                "What is DevOps?": "DevOps is a set of practices combining software development and IT operations.",
+                "What is Agile?": "Agile is a project management approach focused on iterative development.",
+                "What is Scrum?": "Scrum is a framework for managing complex projects using Agile principles.",
+                "What is a data scientist?": "A data scientist analyzes and interprets complex data to derive insights.",
+                "What is big data?": "Big data refers to large, complex datasets that require advanced tools to process.",
+                "What is SQL?": "SQL stands for Structured Query Language, used for managing databases.",
+                "What is NoSQL?": "NoSQL databases are non-relational and suitable for large-scale data storage.",
+                "What is AI ethics?": "AI ethics focuses on the moral implications of using artificial intelligence.",
+                "What is natural language processing?": "NLP is a branch of AI that enables computers to understand human language.",
+                "What is reinforcement learning?": "Reinforcement learning is a machine learning approach based on rewards and penalties.",
+                "What is an API key?": "An API key is a unique identifier used to authenticate requests to an API.",
+                "What is a neural network?": "A neural network is a system of algorithms modeled after the human brain.",
+                "What is Aadhaar?": "Aadhaar is a unique 12-digit identification number issued by the Indian government to residents of India.",
+                "What is UPI?": "UPI stands for Unified Payments Interface, a real-time payment system developed by NPCI in India.",
+                "What is PAN card?": "A PAN card is a Permanent Account Number used for financial and tax-related transactions in India.",
+                "What is NEET?": "NEET is the National Eligibility cum Entrance Test for admission to medical courses in India.",
+                "What is GST?": "GST stands for Goods and Services Tax, a unified tax system implemented in India.",
+                "What is the population of India?": "As of 2024, India's population is estimated to be over 1.4 billion.",
+                "What is ISRO?": "ISRO stands for the Indian Space Research Organisation, India's national space agency.",
+                "What is Make in India?": "Make in India is a government initiative to encourage manufacturing in India.",
+                "What is Digital India?": "Digital India is a campaign to improve online infrastructure and increase internet accessibility.",
+                "What is the currency of India?": "The currency of India is the Indian Rupee (INR).",
+                "What is the national bird of India?": "The national bird of India is the peacock.",
+                "What is the national flower of India?": "The national flower of India is the lotus.",
+                "What is the capital of India?": "The capital of India is New Delhi.",
+                "What is IRCTC?": "IRCTC is the Indian Railway Catering and Tourism Corporation, managing railway bookings in India.",
+                "What is PMAY?": "PMAY stands for Pradhan Mantri Awas Yojana, a housing scheme for affordable homes in India.",
+                "What is Ayushman Bharat?": "Ayushman Bharat is a health scheme providing insurance to economically weaker sections in India.",
+                "What is Jan Dhan Yojana?": "Jan Dhan Yojana is a financial inclusion program for affordable banking services.",
+                "What is JEE?": "JEE is the Joint Entrance Examination for admission to engineering colleges in India.",
+                "What is NREGA?": "NREGA is the Mahatma Gandhi National Rural Employment Guarantee Act for rural employment in India.",
+                "What is FSSAI?": "FSSAI is the Food Safety and Standards Authority of India, ensuring food safety in the country.",
+                "What is EPFO?": "EPFO stands for Employees' Provident Fund Organisation, managing provident funds for employees in India.",
+                "What is LIC?": "LIC stands for Life Insurance Corporation, a leading insurance provider in India.",
+                "What is IPO?": "IPO stands for Initial Public Offering, a process for companies to raise funds by issuing shares to the public.",
+                "What is SEBI?": "SEBI stands for Securities and Exchange Board of India, regulating the securities market in India.",
+                "What is RTO?": "RTO stands for Regional Transport Office, managing vehicle registration and licenses in India.",
+                "What is BHIM?": "BHIM is a mobile payment app developed by NPCI based on UPI for digital transactions in India.",
+                "What is FASTag?": "FASTag is a device for automatic toll collection at highway toll plazas in India.",
+                "What is RTGS?": "RTGS stands for Real-Time Gross Settlement, a payment system for high-value transactions in India.",
+                "What is NEFT?": "NEFT stands for National Electronic Funds Transfer, a system for transferring funds electronically in India.",
+                "What is IMPS?": "IMPS stands for Immediate Payment Service, enabling instant money transfers in India.",
+                "What is the Right to Information Act?": "The Right to Information Act allows citizens to request information from public authorities in India.",
+                "What is Swachh Bharat Abhiyan?": "Swachh Bharat Abhiyan is a campaign for cleanliness and sanitation in India.",
+                "What is the Startup India initiative?": "Startup India supports startups by providing benefits like tax exemptions and funding.",
+                "What is Atmanirbhar Bharat?": "Atmanirbhar Bharat is a campaign to promote self-reliance and local manufacturing in India.",
+                "What is India's literacy rate?": "As of the latest estimates, India's literacy rate is approximately 77.7%.",
+                "What is Chandrayaan?": "Chandrayaan is India's lunar exploration mission series developed by ISRO.",
+                "What is PSLV?": "PSLV stands for Polar Satellite Launch Vehicle, a launch vehicle developed by ISRO.",
+                "What is Gaganyaan?": "Gaganyaan is India's first human spaceflight mission planned by ISRO.",
+                "What is the Taj Mahal?": "The Taj Mahal is a UNESCO World Heritage Site and a symbol of love, located in Agra, India.",
+                "What is the national anthem of India?": "The national anthem of India is 'Jana Gana Mana'.",
+                "What is the national sport of India?": "While India has no officially declared national sport, hockey is often considered one.",
+                "What is the Golden Quadrilateral?": "The Golden Quadrilateral is a highway network connecting major cities in India.",
+                "What is the Indian Penal Code?": "The Indian Penal Code is the official criminal code governing law and order in India.",
+                "What is the RBI?": "RBI stands for Reserve Bank of India, the central bank of the country.",
+                "What is a Jan Dhan account?": "A Jan Dhan account is a no-minimum-balance savings account under the Jan Dhan Yojana.",
+                "What is the Ayodhya verdict?": "The Ayodhya verdict resolved a land dispute, allowing the construction of a Ram temple in Ayodhya.",
+                "What is the difference between Lok Sabha and Rajya Sabha?": "Lok Sabha is the lower house of Parliament, while Rajya Sabha is the upper house.",
+                "What is the role of the President of India?": "The President is the ceremonial head of state and supreme commander of the armed forces.",
+                "What is the role of the Prime Minister of India?": "The Prime Minister is the head of government and leads the executive branch.",
+                "Where is Jammu & Kashmir located?": "Jammu & Kashmir is located in the northernmost part of India, sharing borders with Pakistan, China, and Himachal Pradesh.",
+                "What is the history of Jammu & Kashmir?": "Jammu & Kashmir was a princely state before its accession to India in 1947 and later became a Union Territory in 2019.",
+                "Why is Jammu & Kashmir famous?": "Jammu & Kashmir is famous for its scenic beauty, Dal Lake, houseboats, saffron, and rich cultural heritage.",
+                "When is the best time to visit Jammu & Kashmir?": "The best time to visit is from April to October for pleasant weather and scenic beauty.",
+                "How to reach Jammu & Kashmir?": "Jammu & Kashmir can be reached by air via Srinagar Airport, by train to Jammu Tawi, or by road via NH44.",
+                "Who are the famous personalities from Jammu & Kashmir?": "Famous personalities include Sheikh Abdullah, Maqbool Bhat, Farooq Abdullah, and poet Habba Khatoon.",
+                "Which are the main rivers in Jammu & Kashmir?": "The main rivers are the Jhelum, Chenab, Ravi, Tawi, and Indus.",
+                "What is the traditional music of Jammu & Kashmir?": "Sufiana Kalam and Chakri are popular traditional music forms in Jammu & Kashmir.",
+                "Why is Kashmir called 'Paradise on Earth'?": "Kashmir is called 'Paradise on Earth' due to its breathtaking landscapes, lush valleys, and serene lakes.",
+                "How is the climate in Jammu & Kashmir?": "The region has a temperate climate with cold winters, pleasant summers, and heavy snowfall in some areas.",
+                "What is the cultural significance of the Pheran?": "Pheran is a traditional gown worn for warmth and is an iconic symbol of Kashmiri culture.",
+                "Which are the major wildlife sanctuaries in Jammu & Kashmir?": "Hemis National Park, Dachigam National Park, and Kishtwar High Altitude National Park are notable sanctuaries.",
+                "Where is the Shankaracharya Temple located?": "The Shankaracharya Temple is located on Shankaracharya Hill in Srinagar, dedicated to Lord Shiva.",
+                "What is the significance of saffron farming in Kashmir?": "Kashmir produces the world's finest saffron, primarily grown in Pampore, and is an important export crop.",
+                "When did Jammu & Kashmir become a Union Territory?": "Jammu & Kashmir became a Union Territory on October 31, 2019.",
+                "Why is Dal Lake so popular?": "Dal Lake is popular for its floating gardens, houseboats, and Shikara rides, offering a unique experience.",
+                "How is the education system in Jammu & Kashmir?": "Jammu & Kashmir has notable universities like the University of Kashmir and Baba Ghulam Shah Badshah University, focusing on higher education.",
+                "What is the Amarnath Cave known for?": "The Amarnath Cave is a sacred Hindu shrine dedicated to Lord Shiva, featuring a naturally forming ice lingam.",
+                "Who are the Dogras?": "The Dogras are an ethnic group in Jammu, known for their rich cultural heritage and contribution to the Dogra Regiment.",
+                "Which are the top tourist destinations in Jammu & Kashmir?": "Popular destinations include Srinagar, Gulmarg, Pahalgam, Sonamarg, and Jammu.",
+                "What is the significance of the Chenab Valley?": "The Chenab Valley is known for its scenic beauty and the Baglihar Dam, generating hydroelectric power.",
+                "Where is the Kheer Bhawani Temple?": "The Kheer Bhawani Temple, dedicated to Goddess Ragnya Devi, is located in Tulmulla, near Srinagar.",
+                "How is the economy of Jammu & Kashmir?": "The economy is driven by tourism, agriculture, handicrafts, and horticulture, particularly apples and walnuts.",
+                "Why is Gulmarg called the 'Meadow of Flowers'?": "Gulmarg is called the 'Meadow of Flowers' due to its lush meadows and vibrant blooms during spring and summer.",
+                "What is the role of the J&K Police?": "The J&K Police is responsible for maintaining law and order and combating terrorism in the region.",
+                "Which crops are grown in Jammu & Kashmir?": "Major crops include rice, maize, wheat, apples, saffron, and walnuts.",
+                "When is the Tulip Festival held?": "The Tulip Festival is held in April at the Indira Gandhi Memorial Tulip Garden in Srinagar.",
+                "What is the cuisine of Jammu?": "Jammu's cuisine includes Rajma Chawal, Kalari Kulcha, and Dogri dishes like Auriya and Khatta Meat.",
+                "How does Jammu & Kashmir celebrate Eid?": "Eid is celebrated with prayers, festive meals, and community gatherings, especially in the Kashmir Valley.",
+                "Why is the J&K Bank important?": "The J&K Bank is a leading financial institution, providing banking services and supporting the region's economy.",
+                "What is the literacy rate in Jammu & Kashmir?": "The literacy rate in Jammu & Kashmir is approximately 77%.",
+                "Who was Sheikh Abdullah?": "Sheikh Abdullah, also known as the 'Lion of Kashmir,' was a prominent leader and the first Prime Minister of J&K.",
+                "Which fruits are famous in Kashmir?": "Apples, cherries, pears, and apricots are famous fruits from Kashmir.",
+                "What is the history of the Mughal Gardens?": "The Mughal Gardens were built during the Mughal era, inspired by Persian-style gardens.",
+                "Where is Bhaderwah located?": "Bhaderwah, known as 'Mini Kashmir,' is a picturesque valley in the Doda district of Jammu.",
+                "How do people in Jammu & Kashmir celebrate Navroz?": "Navroz, the Persian New Year, is celebrated with prayers, feasts, and cultural performances.",
+                "Why is Wazwan special in Kashmiri culture?": "Wazwan is a multi-course meal central to Kashmiri hospitality and celebrations.",
+                "What are the major handicrafts of Jammu & Kashmir?": "Famous handicrafts include Pashmina shawls, Kashmiri carpets, papier-mâché, and walnut wood carvings.",
+                "What is the literacy rate in Ladakh?": "The literacy rate in Ladakh is around 77%, focusing on improving education infrastructure.",
+                "Who built the Vaishno Devi Shrine?": "The Vaishno Devi Shrine has ancient origins, believed to have been built by devotees over centuries.",
+                "Which is the longest river in Jammu & Kashmir?": "The Jhelum River is the longest river in Jammu & Kashmir, flowing through the Kashmir Valley.",
+                "Where is Rajouri located?": "Rajouri is a district in the Jammu division of Jammu & Kashmir, located near the Line of Control (LoC).",
+                "What is Rajouri famous for?": "Rajouri is famous for its scenic beauty, historical forts, and temples like the Baba Ghulam Shah Badshah Shrine.",
+                "Who was Baba Ghulam Shah Badshah?": "Baba Ghulam Shah Badshah was a Sufi saint and his shrine in Rajouri is a popular pilgrimage site.",
+                "Why is Rajouri important in history?": "Rajouri has historical significance as it was part of the ancient Panchal kingdom and a trade route during the Mughal era.",
+                "How is the climate in Rajouri?": "Rajouri has a subtropical climate with cold winters and warm summers.",
+                "What are the main languages spoken in Rajouri?": "The main languages spoken are Gojri, Dogri, Urdu, and Kashmiri.",
+                "Which rivers flow through Rajouri?": "The Manawar Tawi River flows through Rajouri, contributing to its agricultural prosperity.",
+                "What is the literacy rate of Rajouri?": "The literacy rate of Rajouri is approximately 68%, as per the latest census.",
+                "What are the main attractions in Rajouri?": "Key attractions include Dhanidhar Fort, Shahdra Sharif, Rajouri Fort, and Thanna Mandi.",
+                "Why is Shahdra Sharif significant?": "Shahdra Sharif is a revered shrine dedicated to Baba Ghulam Shah Badshah, attracting people from all communities.",
+                "What are the primary occupations in Rajouri?": "Agriculture, livestock rearing, and government services are the primary occupations in Rajouri.",
+                "Which crops are grown in Rajouri?": "Wheat, maize, and paddy are the major crops grown in Rajouri, along with horticulture like apples and walnuts.",
+                "When is the best time to visit Rajouri?": "The best time to visit Rajouri is from March to October, when the weather is pleasant and suitable for sightseeing.",
+                "What is the cultural heritage of Rajouri?": "Rajouri has a rich cultural heritage with influences of Dogra, Kashmiri, and Pahari traditions.",
+                "How to reach Rajouri?": "Rajouri can be reached by road via NH144A, with the nearest airport in Jammu (150 km) and railway station in Jammu Tawi.",
+                "What is the population of Rajouri?": "The population of Rajouri is around 650,000, as per the latest estimates.",
+                "What is Thanna Mandi known for": "Thanna Mandi is known for its scenic landscapes and proximity to Mughal Road, connecting Poonch and Shopian.",
+                "What is the significance of Mughal Road?": "The Mughal Road is a historical route connecting Rajouri to Shopian, used by Mughal emperors for travel.",
+                "Who are the Gujjars and Bakerwals?": "Gujjars and Bakerwals are nomadic tribes in Rajouri, known for their traditional lifestyles and livestock rearing.",
+                "What is the Rajouri Day celebration?": "Rajouri Day is celebrated on April 13th to commemorate the liberation of Rajouri from tribal invaders in 1948.",
+                "Baba Ghulam Shah Badshah University": "Baba Ghulam Shah Badshah University is a public university located in Rajouri, Jammu & Kashmir, established in 2002.",
+                "Where is BGSBU located?": "The university is situated in Dhanore, Rajouri, Jammu & Kashmir, amidst the picturesque surroundings of the Pir Panjal mountain range.",
+                "Who was Baba Ghulam Shah Badshah": "Baba Ghulam Shah Badshah was a revered Sufi saint known for his teachings of peace and spirituality in the region.",
+                "What are the courses offered at BGSBU?": "The university offers undergraduate, postgraduate, and doctoral programs in engineering, management, humanities, sciences, and Islamic studies.",
+                "When was BGSBU established?": "Baba Ghulam Shah Badshah University was established in the year 2002 by the Jammu & Kashmir Legislature under Act No. XVI of 2002.",
+                "Why is BGSBU named after Baba Ghulam Shah Badshah?": "The university is named in honor of the Sufi saint Baba Ghulam Shah Badshah to reflect his legacy of promoting knowledge, harmony, and understanding.",
+                "What is the motto of BGSBU?": "The university's motto is 'Iqra Bismi Rabbik' which means 'Read in the name of your Lord,' emphasizing the pursuit of knowledge.",
+                "How is the campus of BGSBU?": "The campus is spread over a large area in the scenic Rajouri district, with modern infrastructure, libraries, hostels, and research facilities.",
+                "What are the major schools at BGSBU?": "The university has schools like the School of Engineering & Technology, School of Biosciences & Biotechnology, School of Management Studies, and School of Islamic Studies & Languages.",
+                "Which engineering courses are offered at BGSBU?": "BGSBU offers B.Tech and M.Tech programs in Civil Engineering, Electrical Engineering, Computer Science, and Information Technology.",
+                "How is the placement at BGSBU?": "The placement cell at BGSBU has facilitated job opportunities in reputed companies, with alumni working across various sectors.",
+                "What is the significance of the School of Islamic Studies at BGSBU?": "The School of Islamic Studies promotes research and education in Islamic culture, history, and languages, contributing to the preservation of the region's rich heritage.",
+                "What is the admission process for BGSBU?": "Admission is based on entrance exams conducted by the university or national-level tests like JEE, GATE, and CAT, depending on the program.",
+                "Is BGSBU recognized by UGC?": "Yes, Baba Ghulam Shah Badshah University is recognized by the University Grants Commission (UGC) of India.",
+                "What are the research opportunities at BGSBU?": "BGSBU offers Ph.D. programs in various disciplines and encourages research through its well-equipped laboratories and collaborations.",
+                "What are the notable achievements of BGSBU?": "The university has been known for its contributions to education and research in Jammu & Kashmir, particularly in engineering and biotechnology.",
+                "What is the student life like at BGSBU?": "Student life at BGSBU includes cultural activities, sports events, and academic seminars, fostering an enriching environment.",
+                "Does BGSBU provide hostel facilities?": "Yes, the university has separate hostels for boys and girls, with modern amenities and a safe environment.",
+                "What are the cultural events at BGSBU?": "The university hosts various cultural events, including the annual fest 'Gulistaan,' celebrating talent and creativity.",
+                "How to reach BGSBU?": "BGSBU is about 155 km from Jammu city, and it is well-connected by road. The nearest railway station is Jammu Tawi, and the nearest airport is Jammu Airport.",
+
+                "What is the full form of J&K?": "Jammu and Kashmir",
+                "What is the full form of BGSBU?": "Baba Ghulam Shah Badshah University",
+                "What is the full form of LOK?": "Line of Control",
+                "What is the full form of DC?": "Deputy Commissioner",
+                "What is the full form of SP?": "Superintendent of Police",
+                "What is the full form of PDD?": "Power Development Department",
+                "What is the full form of RTI?": "Right to Information",
+                "What is the full form of GDP?": "Gross Domestic Product",
+                "What is the full form of UNESCO?": "United Nations Educational, Scientific and Cultural Organization",
+                "What is the full form of NGO?": "Non-Governmental Organization",
+                "What is the full form of MP?": "Member of Parliament",
+                "What is the full form of MLA?": "Member of Legislative Assembly",
+                "What is the full form of ATM?": "Automated Teller Machine",
+                "What is the full form of HR?": "Human Resources",
+                "What is the full form of CEO?": "Chief Executive Officer",
+                "What is the full form of COO?": "Chief Operating Officer",
+                "What is the full form of CFO?": "Chief Financial Officer",
+                "What is the full form of PM?": "Prime Minister",
+                "What is the full form of GM?": "General Manager",
+                "What is the full form of SMS?": "Short Message Service",
+                "What is the full form of URL?": "Uniform Resource Locator",
+                "What is the full form of VPN?": "Virtual Private Network",
+                "What is the full form of JCP?": "Joint Control Program",
+                "What is the full form of TSR?": "Traffic Safety Report",
+                "What is the full form of IRS?": "Indian Revenue Service",
+                "What is the full form of MNC?": "Multinational Corporation",
+                "What is the full form of USD?": "United States Dollar",
+                "What is the full form of EUR?": "Euro",
+                "What is the full form of PIN?": "Personal Identification Number",
+                "What is the full form of B2B?": "Business to Business",
+                "What is the full form of B2C?": "Business to Consumer",
+
+                "What is the full form of UGC?": "University Grants Commission",
+                "What is the full form of NAAC?": "National Assessment and Accreditation Council",
+                "What is the full form of AICTE?": "All India Council for Technical Education",
+                "What is the full form of NET?": "National Eligibility Test",
+                "What is the full form of JEE?": "Joint Entrance Examination",
+                "What is the full form of NEET?": "National Eligibility cum Entrance Test",
+                "What is the full form of Ph.D.?": "Doctor of Philosophy",
+                "What is the full form of CBSE?": "Central Board of Secondary Education",
+                "What is the full form of GATE?": "Graduate Aptitude Test in Engineering",
+                "What is the full form of IGNOU?": "Indira Gandhi National Open University",
+                "What is the full form of ICSE?": "Indian Certificate of Secondary Education",
+                "What is the full form of ISRO?": "Indian Space Research Organisation",
+                "What is the full form of NPTEL?": "National Programme on Technology Enhanced Learning",
+                "What is the full form of IIT?": "Indian Institutes of Technology",
+                "What is the full form of IIM?": "Indian Institutes of Management",
+                "What is the full form of DCE?": "Directorate of Technical Education",
+                "What is the full form of IPU?": "Indraprastha University",
+                "What is the full form of AIIMS?": "All India Institute of Medical Sciences",
+                "What is the full form of NIT?": "National Institute of Technology",
+                "What is the full form of NCC?": "National Cadet Corps",
+                "What is the full form of B.Ed?": "Bachelor of Education",
+                "What is the full form of M.Ed?": "Master of Education",
+                "What is the full form of MBA?": "Master of Business Administration",
+                "What is the full form of MCA?": "Master of Computer Applications",
+                "What is the full form of B.Tech?": "Bachelor of Technology",
+                "What is the full form of M.Tech?": "Master of Technology",
+                "What is the full form of BBA?": "Bachelor of Business Administration",
+                "What is the full form of BCA?": "Bachelor of Computer Applications",
+                "What is the full form of PGD?": "Post Graduate Diploma",
+                "What is the full form of SLAT?": "Symbiosis Law Admission Test",
+                "What is the full form of CLAT?": "Common Law Admission Test",
+                "What is the full form of CPT?": "Common Proficiency Test",
+                "What is the full form of AIEEE?": "All India Engineering Entrance Examination",
+                "What is the full form of DSE?": "Delhi School of Economics",
+
+                "What is the full form of HTTP?": "HyperText Transfer Protocol",
+                "What is the full form of HTML?": "HyperText Markup Language",
+                "What is the full form of CSS?": "Cascading Style Sheets",
+                "What is the full form of JSON?": "JavaScript Object Notation",
+                "What is the full form of XML?": "eXtensible Markup Language",
+                "What is the full form of API?": "Application Programming Interface",
+                "What is the full form of IP?": "Internet Protocol",
+                "What is the full form of URL?": "Uniform Resource Locator",
+                "What is the full form of RAM?": "Random Access Memory",
+                "What is the full form of CPU?": "Central Processing Unit",
+                "What is the full form of LAN?": "Local Area Network",
+                "What is the full form of WAN?": "Wide Area Network",
+                "What is the full form of SMTP?": "Simple Mail Transfer Protocol",
+                "What is the full form of POP?": "Post Office Protocol",
+                "What is the full form of IMAP?": "Internet Message Access Protocol",
+                "What is the full form of DNS?": "Domain Name System",
+                "What is the full form of FTP?": "File Transfer Protocol",
+                "What is the full form of Wi-Fi?": "Wireless Fidelity",
+                "What is the full form of 3G?": "Third Generation",
+                "What is the full form of 4G?": "Fourth Generation",
+                "What is the full form of 5G?": "Fifth Generation",
+                "What is the full form of LCD?": "Liquid Crystal Display",
+                "What is the full form of LED?": "Light Emitting Diode",
+                "What is the full form of OLED?": "Organic Light Emitting Diode",
+                "What is the full form of USB?": "Universal Serial Bus",
+                "What is the full form of SATA?": "Serial Advanced Technology Attachment",
+                "What is the full form of HDD?": "Hard Disk Drive",
+                "What is the full form of SSD?": "Solid State Drive",
+                "What is the full form of BIOS?": "Basic Input/Output System",
+                "What is the full form of GUI?": "Graphical User Interface",
+                "What is the full form of CLI?": "Command Line Interface",
+                "What is the full form of SSH?": "Secure Shell",
+                "What is the full form of AI?": "Artificial Intelligence",
+                "What is the full form of ML?": "Machine Learning",
+                "What is the full form of IoT?": "Internet of Things",
+                "What is the full form of AR?": "Augmented Reality",
+                "What is the full form of VR?": "Virtual Reality",
+                "What is the full form of MR?": "Mixed Reality",
+                "What is the full form of USB-C?": "Universal Serial Bus Type C",
+                "What is the full form of AIOS?": "Artificial Intelligence Operating System",
+                "What is the full form of DRM?": "Digital Rights Management",
+                "What is the full form of OCR?": "Optical Character Recognition",
+                "What is the full form of SDK?": "Software Development Kit",
+                "What is the full form of IDE?": "Integrated Development Environment",
+                "What is the full form of CSS3?": "Cascading Style Sheets Version 3",
+                "What is the full form of XSS?": "Cross-Site Scripting",
+                "What is the full form of SQL?": "Structured Query Language",
+                "What is the full form of NoSQL?": "Not Only SQL",
+                "What is the full form of IDE?": "Integrated Development Environment",
+                "What is the full form of IPV6?": "Internet Protocol Version 6",
+                "What is the full form of HTTP2?": "HyperText Transfer Protocol Version 2",
+                "What is the full form of AJAX?": "Asynchronous JavaScript and XML",
+                "What is the full form of UI?": "User Interface",
+                "What is the full form of UX?": "User Experience",
+                "What is the full form of PHP?": "Hypertext Preprocessor",
+                "What is the full form of JS?": "JavaScript",
+                "What is the full form of JVM?": "Java Virtual Machine",
+                "What is the full form of RDBMS?": "Relational Database Management System",
+                "What is the full form of MSSQL?": "Microsoft SQL Server",
+                "What is the full form of XML-RPC?": "XML Remote Procedure Call",
+                "What is the full form of JSON-RPC?": "JSON Remote Procedure Call",
+                "What is the full form of UML?": "Unified Modeling Language",
+                "What is the full form of VPN?": "Virtual Private Network",
+                "What is the full form of B2B?": "Business to Business",
+                "What is the full form of B2C?": "Business to Consumer",
+                "What is the full form of C2C?": "Consumer to Consumer",
+                "What is the full form of SEO?": "Search Engine Optimization",
+                "What is the full form of SEM?": "Search Engine Marketing",
+                "What is the full form of CMS?": "Content Management System",
+
+                "What is the full form of ICU?": "Intensive Care Unit",
+                "What is the full form of OPD?": "Outpatient Department",
+                "What is the full form of CT Scan?": "Computed Tomography Scan",
+                "What is the full form of MRI?": "Magnetic Resonance Imaging",
+                "What is the full form of X-ray?": "X-radiation",
+                "What is the full form of ECG?": "Electrocardiogram",
+                "What is the full form of EEG?": "Electroencephalogram",
+                "What is the full form of BPM?": "Beats Per Minute",
+                "What is the full form of FDA?": "Food and Drug Administration",
+                "What is the full form of WHO?": "World Health Organization",
+                "What is the full form of AIDS?": "Acquired Immunodeficiency Syndrome",
+                "What is the full form of HIV?": "Human Immunodeficiency Virus",
+                "What is the full form of CVD?": "Cardiovascular Disease",
+                "What is the full form of CPR?": "Cardiopulmonary Resuscitation",
+                "What is the full form of EPI?": "Expanded Programme on Immunization",
+                "What is the full form of TB?": "Tuberculosis",
+                "What is the full form of MDR-TB?": "Multi-Drug Resistant Tuberculosis",
+                "What is the full form of SARS?": "Severe Acute Respiratory Syndrome",
+                "What is the full form of COVID-19?": "Coronavirus Disease 2019",
+                "What is the full form of PPE?": "Personal Protective Equipment",
+                "What is the full form of VIRUS?": "Vital Infectious Research Unveiling Syndrome",
+                "What is the full form of ICU?": "Intensive Care Unit",
+                "What is the full form of BLS?": "Basic Life Support",
+                "What is the full form of ALS?": "Advanced Life Support",
+                "What is the full form of NIV?": "Non-invasive Ventilation",
+                "What is the full form of RBC?": "Red Blood Cells",
+                "What is the full form of WBC?": "White Blood Cells",
+                "What is the full form of CBC?": "Complete Blood Count",
+                "What is the full form of Hemoglobin?": "Hemoglobin",
+                "What is the full form of Hematocrit?": "Hematocrit",
+                "What is the full form of Platelets?": "Platelets",
+
+                "What is the full form of DNA?": "Deoxyribonucleic Acid",
+                "What is the full form of RNA?": "Ribonucleic Acid",
+                "What is the full form of ATP?": "Adenosine Triphosphate",
+                "What is the full form of UV?": "Ultraviolet",
+                "What is the full form of IR?": "Infrared",
+                "What is the full form of NMR?": "Nuclear Magnetic Resonance",
+                "What is the full form of LHC?": "Large Hadron Collider",
+                "What is the full form of GPS?": "Global Positioning System",
+                "What is the full form of O2?": "Oxygen",
+                "What is the full form of CO2?": "Carbon Dioxide",
+                "What is the full form of NO2?": "Nitrogen Dioxide",
+                "What is the full form of H2O?": "Water",
+                "What is the full form of H2O2?": "Hydrogen Peroxide",
+                "What is the full form of K?": "Potassium",
+                "What is the full form of NaCl?": "Sodium Chloride",
+                "What is the full form of NH3?": "Ammonia",
+                "What is the full form of N2?": "Nitrogen",
+                "What is the full form of O3?": "Ozone",
+                "Hello?": "How can I assist you today?",
+                "What’s new today?": "Not much, but I’m ready to help! What can I do for you?",
+                "Any plans for today?": "I’m here to help you with whatever you need. How can I assist you?",
+                "What can I help you with?": "Let me know what you need, and I’ll do my best to assist!",
+                "Need any help today?": "I’m ready to help! What would you like to work on today?",
+                "Got any questions?": "Feel free to ask, I’m here to help you!",
+                "How can I make your day easier?": "Just let me know how I can help, and I’ll do my best!",
+                "What’s on your mind?": "I’m here to listen and assist, what’s up?",
+                "Is there something specific you need today?": "Just let me know, and I’ll provide the help you need!",
+                "Anything I can help with today?": "Let me know if you need assistance with something!",
+                "What are you working on today?": "Feel free to share, I’d love to help if you need anything!",
+                "Can I assist with anything?": "I’m ready to assist! What can I do for you?",
+                "What do you need help with?": "I’m here to assist with anything you need!",
+                "How’s your day going?": "I’m here to help, no matter how your day is going!",
+                "What can I do for you today?": "Let me know, and I’ll get right to it!",
+                "What’s your plan for today?": "I’m here to help you with any tasks or plans you have!",
+                "Do you need any advice?": "I’d be happy to offer some advice. What do you need help with?",
+                "What’s on your to-do list today?": "Tell me what’s on your mind, and I’ll assist you with it!",
+                "How can I help you make progress today?": "I’m here to help you make progress on whatever you need!",
+                "Is there a project you're focused on?": "Let me know what you're working on, and I can help you out!",
+            };
+
+
+            document.addEventListener("DOMContentLoaded", function () {
+                const micIcon = document.getElementById("mic-icon");
+                const messageInput = document.getElementById("message-input");
+                const sendButton = document.getElementById("send-button");
+                let recognition;
+                let isListening = false;
+
+                // Check if SpeechRecognition API is supported
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                if (!SpeechRecognition) {
+                    console.warn("Speech recognition is not supported in this browser.");
+                    micIcon.style.display = "none";
+                    return;
+                }
+
+                // Initialize SpeechRecognition
+                recognition = new SpeechRecognition();
+                recognition.continuous = false;
+                recognition.lang = "en-US";
+                recognition.interimResults = false;
+
+                // When mic icon is clicked, start listening mandatorily.
+                micIcon.addEventListener("click", function () {
+                    console.log("Mic icon clicked.");
+                    if (!isListening) {
+                        recognition.start();
+                    }
+                });
+
+                recognition.onstart = function () {
+                    isListening = true;
+                    micIcon.style.color = "red"; // Visual feedback that recording is active
+                    console.log("Speech recognition started.");
+                };
+
+                recognition.onresult = function (event) {
+                    console.log("Speech recognition result received:", event);
+                    const transcript = event.results[0][0].transcript;
+                    messageInput.value = transcript;
+                };
+
+                recognition.onerror = function (event) {
+                    console.error("Speech recognition error:", event.error);
+                    alert("Speech recognition error: " + event.error);
+                    isListening = false;
+                    micIcon.style.color = "#686565"; // Reset color on error
+                };
+
+                recognition.onend = function () {
+                    isListening = false;
+                    micIcon.style.color = "#686565"; // Reset mic icon color when done
+                    console.log("Speech recognition ended.");
+                };
+
+                // Allow sending the message manually via Enter key (or clicking the send button)
+                messageInput.addEventListener("keydown", function (event) {
+                    if (event.key === "Enter" && !event.shiftKey) {
+                        event.preventDefault();
+                        sendButton.click();
+                    }
+                });
+            });
+
+
+            // Function to normalize input (fix missing spaces, remove ?,.-&, and correct common typos)
+            function normalizeInput(text) {
+                // Remove unwanted punctuation
+                text = text.replace(/[?.,\-&]/g, '').toLowerCase().trim();
+
+                // Automatically split merged words using common words
+                const commonWords = ["what", "who", "is", "the", "when", "where", "why", "how", "does", "can", "do", "was", "will", "shall"];
+                commonWords.forEach(word => {
+                    const regex = new RegExp(word + "([a-zA-Z])", "g");
+                    text = text.replace(regex, word + " $1"); // Add space after word
+                });
+
+                // Dictionary-based correction (basic spell check for common words)
+                const dictionary = {
+                    "tahirnaseer": "tahir naseer",
+                    "tabirnaseer": "tahir naseer",
+                    "dawoodhussain": "dawood hussain",
+                    "owaischouhan": "owaish chouhan",
+                    "tahirgpt": "tahir gpt"
+                };
+
+                // Replace words using dictionary
+                text = text.split(" ").map(word => dictionary[word] || word).join(" ");
+
+                // Ensure proper spacing
+                return text.replace(/\s+/g, ' ').trim();
+            }
+
+            // Handle textarea key events
+            input.addEventListener('keydown', function (e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    form.dispatchEvent(new Event('submit'));
+                }
+            });
+
+            // Handle form submission
+            form.addEventListener('submit', async function (e) {
+                e.preventDefault();
+
+                let message = input.value.trim();
+                if (!message) return;
+
+                // Normalize input for case insensitivity, punctuation, and missing spaces
+                const normalizedMessage = normalizeInput(message);
+
+                // Get the button and its icons
+                const submitButton = form.querySelector('button[type="submit"]');
+                const sendIcon = submitButton.querySelector('.bi-send-fill');
+                const stopIcon = submitButton.querySelector('.bi-stop-fill');
+
+                // Toggle to stop button
+                sendIcon.classList.add('d-none');
+                stopIcon.classList.remove('d-none');
+                submitButton.classList.add('btn-danger');
+                submitButton.classList.remove('btn-primary');
+
+                // Fade out welcome container if it's the first message
+                const welcomeContainer = document.getElementById('welcome-container');
+                if (welcomeContainer) {
+                    welcomeContainer.classList.add('fade-out');
+                    setTimeout(() => welcomeContainer.remove(), 500);
+                }
+
+                // Clear input and disable form
+                input.value = '';
+                input.disabled = true;
+
+                // Add user message immediately
+                const userMessage = createMessageElement('user');
+                userMessage.contentElement.innerHTML = marked.parse(message);
+                messagesContainer.appendChild(userMessage.element);
+                scrollToBottom();
+
+                // Show loading indicator if data is not preloaded
+                if (!preloadedData[Object.keys(preloadedData).find(key => normalizeInput(key) === normalizedMessage)]) {
+                    showLoadingIndicator();
+                }
+
+                try {
+                    // Check preloaded data first (case-insensitive and punctuation-insensitive lookup)
+                    const matchedKey = Object.keys(preloadedData).find(key => normalizeInput(key) === normalizedMessage);
+                    if (matchedKey) {
+                        const aiMessage = createMessageElement('assistant');
+                        messagesContainer.appendChild(aiMessage.element);
+                        scrollToBottom();
+                        await streamTextWithCaret(aiMessage.contentElement, preloadedData[matchedKey]);
+                    } else {
+                        const response = await fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(normalizedMessage)}`);
+                        const data = await response.json();
+                        removeLoadingIndicator();
+
+                        if (data.extract) {
+                            const aiMessage = createMessageElement('assistant');
+                            messagesContainer.appendChild(aiMessage.element);
+                            scrollToBottom();
+                            await streamTextWithCaret(aiMessage.contentElement, data.extract);
+                        } else {
+                            showAlert("No information found on TahirGPT due to Server Problem", "warning");
+                        }
+                    }
+                } catch (error) {
+                    removeLoadingIndicator();
+                    showAlert("Error fetching data from TahirGPT", "danger");
+                } finally {
+                    // Reset button to send state
+                    sendIcon.classList.remove('d-none');
+                    stopIcon.classList.add('d-none');
+                    submitButton.classList.remove('btn-danger');
+                    submitButton.classList.add('btn-primary');
+                    input.disabled = false;
+                    scrollToBottom();
+                }
+            });
+
+            async function streamTextWithCaret(element, text, speed = 20) {
+                let currentText = '';
+                const chars = text.split('');
+
+                const tempDiv = document.createElement('div');
+                const caret = document.createElement('span');
+                caret.className = 'caret';
+                caret.textContent = '';
+                caret.style.color = 'darkblack';
+                element.appendChild(caret);
+
+                for (let i = 0; i < chars.length; i++) {
+                    const char = chars[i];
+                    currentText += char;
+                    tempDiv.innerHTML = marked.parse(currentText);
+                    element.innerHTML = tempDiv.innerHTML;
+                    element.appendChild(caret);
+
+                    element.querySelectorAll('pre code').forEach((block) => {
+                        hljs.highlightBlock(block);
+                    });
+
+                    scrollToBottom();
+                    await new Promise(resolve => setTimeout(resolve, speed));
+                }
+
+                caret.remove();
+            }
+            function showAlert(message, type) {
+                const alertBox = document.createElement('div');
+                alertBox.className = `alert-rope alert-${type}`;
+
+                // Choose FontAwesome Icon Based on Alert Type
+                let iconClass;
+                switch (type) {
+                    case "warning":
+                        iconClass = "fa-solid fa-triangle-exclamation"; // ⚠️ Warning
+                        break;
+                    case "danger":
+                        iconClass = "fa-solid fa-circle-xmark"; // ❌ Error
+                        break;
+                    case "success":
+                        iconClass = "fa-solid fa-circle-check"; // ✅ Success
+                        break;
+                    case "info":
+                        iconClass = "fa-solid fa-circle-info"; // ℹ️ Info
+                        break;
+                    default:
+                        iconClass = "fa-solid fa-bell"; // 🔔 Default alert
+                }
+
+                // Alert Content with Rope and Icon
+                alertBox.innerHTML = `
+        <div class="rope"></div>
+        <i class="${iconClass} alert-icon"></i>
+        <span>${message}</span>
+    `;
+
+                document.body.appendChild(alertBox);
+
+                // Remove after animation
+                setTimeout(() => {
+                    alertBox.classList.add('pulled-up');
+                    setTimeout(() => alertBox.remove(), 1000);
+                }, 4000);
+            }
+
+            document.addEventListener("DOMContentLoaded", () => {
+                updateChatLists(); // Ensure chat list is always visible
+                const currentChatId = sessionStorage.getItem("currentChatId");
+                if (currentChatId) {
+                    loadChat(currentChatId);
+                }
+
+                document.getElementById("newChatBtn").addEventListener("click", addNewChat);
+                document.getElementById("sidebarClose").addEventListener("click", () => {
+                    document.getElementById("sidebar").style.display = "none";
+                });
+            });
+
+            function loadChats() {
+                const stored = localStorage.getItem("chatHistory");
+                return stored ? JSON.parse(stored) : [];
+            }
+
+            function saveChats(chats) {
+                localStorage.setItem("chatHistory", JSON.stringify(chats));
+            }
+
+            function createChatLink(chat) {
+                const chatLink = document.createElement("div");
+                chatLink.className = "chat-item d-flex justify-content-between align-items-center px-3 py-2";
+                chatLink.dataset.chatId = chat.id;
+
+                const titleSpan = document.createElement("span");
+                titleSpan.textContent = chat.title;
+                titleSpan.style.flexGrow = "1";
+
+                const buttonContainer = document.createElement("div");
+                buttonContainer.className = "chat-buttons d-flex gap-2";
+
+                const editBtn = document.createElement("button");
+                editBtn.className = "btn btn-sm btn-outline-success edit-btn";
+                editBtn.innerHTML = '<i class="fas fa-edit"></i>';
+                editBtn.addEventListener("click", (e) => {
+                    e.stopPropagation();
+                    editChat(chat, titleSpan);
+                });
+
+                const deleteBtn = document.createElement("button");
+                deleteBtn.className = "btn btn-sm btn-outline-danger delete-btn";
+                deleteBtn.innerHTML = '<i class="fas fa-trash"></i>';
+                deleteBtn.addEventListener("click", (e) => {
+                    e.stopPropagation();
+                    deleteChat(chat.id);
+                });
+
+                buttonContainer.appendChild(editBtn);
+                buttonContainer.appendChild(deleteBtn);
+
+                chatLink.appendChild(titleSpan);
+                chatLink.appendChild(buttonContainer);
+                chatLink.addEventListener("click", () => loadChat(chat.id));
+
+                return chatLink;
+            }
+
+            function editChat(chat, titleSpan) {
+                const input = document.createElement("input");
+                input.type = "text";
+                input.value = chat.title;
+                input.className = "form-control form-control-sm";
+
+                input.addEventListener("blur", () => {
+                    const newTitle = input.value.trim() || chat.title;
+                    chat.title = newTitle;
+
+                    let chats = loadChats();
+                    const chatIndex = chats.findIndex(c => c.id === chat.id);
+                    if (chatIndex !== -1) {
+                        chats[chatIndex].title = newTitle;
+                        saveChats(chats);
+                    }
+
+                    titleSpan.textContent = newTitle;
+                    titleSpan.style.display = "inline";
+                    input.replaceWith(titleSpan);
+                });
+
+                titleSpan.replaceWith(input);
+                input.focus();
+            }
+
+            function updateChatLists() {
+                const chatListEl = document.querySelector(".chat-list");
+                const chats = loadChats();
+                chatListEl.innerHTML = "";
+
+                if (chats.length === 0) {
+                    chatListEl.innerHTML = `<div class="text-muted small px-3 py-2">No chats yet</div>`;
+                    return;
+                }
+
+                chats.forEach(chat => {
+                    chatListEl.appendChild(createChatLink(chat));
+                });
+            }
+
+            function getRandomPreloadedText() {
+                const keys = Object.keys(preloadedData);
+                const randomKey = keys[Math.floor(Math.random() * keys.length)];
+                return Math.random() < 0.5 ? randomKey : preloadedData[randomKey];
+            }
+
+            function addNewChat() {
+                const chats = loadChats();
+                const textareaValue = document.getElementById("chatInput")?.value.trim();
+                const chatTitle = textareaValue || getRandomPreloadedText();
+
+                const newChat = {
+                    id: Date.now().toString(),
+                    title: chatTitle,
+                    date: new Date().toISOString(),
+                    messages: []
+                };
+
+                chats.push(newChat);
+                saveChats(chats);
+                updateChatLists();
+                loadChat(newChat.id);
+            }
+
+            function editMessage(chatId, messageIndex) {
+                let chats = loadChats();
+                const chat = chats.find(c => c.id === chatId);
+                if (!chat) return;
+
+                const message = chat.messages[messageIndex];
+                if (!message) return;
+
+                const newMessageText = prompt("Edit your message:", message.text);
+                if (newMessageText !== null && newMessageText.trim() !== "") {
+                    chat.messages[messageIndex].text = newMessageText.trim();
+                    saveChats(chats);
+                    loadChat(chatId);
+                }
+            }
+
+            updateChatLists();
+
+            // Global variable for current chat
+            let currentChatId = null;
+
+            // Load a specific chat (by id)
+            function loadChat(chatId) {
+                const chats = loadChats();
+                const chat = chats.find(c => c.id === chatId);
+                if (chat) {
+                    currentChatId = chatId;
+                    sessionStorage.setItem("currentChatId", chatId);
+                    displayChat(chat);
+                }
+            }
+
+            // Display the chat content
+            function displayChat(chat) {
+                const chatContentEl = document.getElementById("chatContent");
+                chatContentEl.innerHTML = "";
+
+                const titleInput = document.createElement("input");
+                titleInput.className = "form-control mb-2";
+                titleInput.value = chat.title;
+
+                titleInput.addEventListener("blur", () => {
+                    let newTitle = titleInput.value.trim() || chat.title;
+                    newTitle = autoCorrectTitle(newTitle);
+                    chat.title = newTitle;
+                    let chats = loadChats();
+                    const index = chats.findIndex(c => c.id === chat.id);
+                    if (index > -1) {
+                        chats[index] = chat;
+                        saveChats(chats);
+                        updateChatLists();
+                    }
+                    titleInput.value = newTitle;
+                });
+
+                chatContentEl.appendChild(titleInput);
+
+                const datePara = document.createElement("p");
+                datePara.className = "text-muted small";
+                datePara.textContent = "Created on: " + new Date(chat.date).toLocaleString();
+                chatContentEl.appendChild(datePara);
+
+                const messagesDiv = document.createElement("div");
+                messagesDiv.className = "chat-messages mb-3";
+
+                chat.messages.forEach(msg => {
+                    const p = document.createElement("p");
+                    p.className = "alert alert-secondary";
+                    p.textContent = msg;
+                    messagesDiv.appendChild(p);
+                });
+
+                chatContentEl.appendChild(messagesDiv);
+
+                const textArea = document.createElement("textarea");
+                textArea.className = "form-control mb-2";
+                textArea.placeholder = "Type your message here...";
+                chatContentEl.appendChild(textArea);
+
+                const sendBtn = document.createElement("button");
+                sendBtn.className = "btn btn-primary";
+                sendBtn.textContent = "Send Message";
+
+                sendBtn.addEventListener("click", () => {
+                    const messageText = textArea.value.trim();
+                    if (messageText !== "") {
+                        chat.messages.push(messageText);
+                        let chats = loadChats();
+                        const index = chats.findIndex(c => c.id === chat.id);
+                        if (index > -1) {
+                            chats[index] = chat;
+                            saveChats(chats);
+                            updateChatLists();
+                            displayChat(chat);
+                        }
+                    }
+                });
+
+                chatContentEl.appendChild(sendBtn);
+            }
+
+            // Delete an individual chat
+            function deleteChat(chatId) {
+                let chats = loadChats();
+                chats = chats.filter(c => c.id !== chatId);
+                saveChats(chats);
+                updateChatLists();
+                if (currentChatId === chatId) {
+                    document.getElementById("chatContent").innerHTML = "";
+                    currentChatId = null;
+                }
+            }
+
+            // Delete all chats
+            function deleteAllChats() {
+                localStorage.removeItem("chatHistory");
+                updateChatLists();
+                document.getElementById("chatContent").innerHTML = "";
+                currentChatId = null;
+            }
+
+            // Logout function
+            function logout() {
+                sessionStorage.clear();
+                localStorage.removeItem("chatHistory");
+                window.location.href = "https://imtahirnaseer.github.io/Portfolio/";
+            }
+
+            // Attach event listeners for buttons
+            document.getElementById("newChatBtn").addEventListener("click", addNewChat);
+            document
+                .getElementById("deleteAllBtn")
+                .addEventListener("click", deleteAllChats);
+
+            // On page load, initialize the chat list from localStorage
+            document.addEventListener("DOMContentLoaded", updateChatLists);
+
+            // Helper function to get CSRF token
+            function getCookie(name) {
+                let cookieValue = null;
+                if (document.cookie && document.cookie !== '') {
+                    const cookies = document.cookie.split(';');
+                    for (let i = 0; i < cookies.length; i++) {
+                        const cookie = cookies[i].trim();
+                        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                            break;
+                        }
+                    }
+                }
+                return cookieValue;
+            }
+
+            // Handle dark mode for code highlighting
+            const darkThemeLink = document.getElementById('hljs-dark-theme');
+            const body = document.body;
+
+            function updateCodeTheme() {
+                if (body.classList.contains('dark-mode')) {
+                    darkThemeLink.removeAttribute('disabled');
+                } else {
+                    darkThemeLink.setAttribute('disabled', '');
+                }
+                // Reapply highlighting to all code blocks
+                document.querySelectorAll('pre code').forEach((block) => {
+                    hljs.highlightBlock(block);
+                });
+            }
+
+            // Initial theme setup
+            updateCodeTheme();
+
+            // Watch for theme changes
+            const observer = new MutationObserver(function (mutations) {
+                mutations.forEach(function (mutation) {
+                    if (mutation.attributeName === 'class') {
+                        updateCodeTheme();
+                    }
+                });
+            });
+
+            observer.observe(body, {
+                attributes: true
+            });
+        });
+
+        // New version with fallback for mobile devices:
+        function copyMessage(button) {
+            const messageContent = button.parentElement.querySelector('.markdown-content').textContent;
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(messageContent).then(() => {
+                    showCopiedFeedback(button);
+                }).catch(() => {
+                    fallbackCopyText(messageContent, button);
+                });
+            } else {
+                fallbackCopyText(messageContent, button);
+            }
+        }
+
+        function fallbackCopyText(text, button) {
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+            textArea.style.position = 'fixed';
+            textArea.style.opacity = '0';
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            try {
+                document.execCommand('copy');
+                showCopiedFeedback(button);
+            } catch (err) {
+                console.error('Fallback: Oops, unable to copy', err);
+            }
+            document.body.removeChild(textArea);
+        }
+
+        function showCopiedFeedback(button) {
+            let feedback = button.parentElement.querySelector('.copy-feedback');
+            if (!feedback) {
+                feedback = document.createElement('span');
+                feedback.className = 'copy-feedback text-success ms-2';
+                feedback.textContent = 'Copied';
+                button.parentElement.appendChild(feedback);
+                setTimeout(() => {
+                    feedback.remove();
+                }, 2000);
+            }
+        }
+
+        function deleteChat(chatId, event) {
+            event.preventDefault();
+            event.stopPropagation();
+
+            // Initialize the Bootstrap modal if not already done
+            const deleteModal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
+            const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+
+            // Set up the confirmation action
+            const performDelete = async () => {
+                try {
+                    const response = await fetch(`/chat/${chatId}/delete/`, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': getCookie('csrftoken'),
+                            'Content-Type': 'application/json'
+                        }
+                    });
+
+                    if (response.ok) {
+                        // Remove the chat item from the UI with animation
+                        const chatItem = event.target.closest('.chat-list-item');
+                        chatItem.style.transition = 'all 0.3s ease';
+                        chatItem.style.opacity = '0';
+                        chatItem.style.transform = 'translateX(-20px)';
+
+                        setTimeout(() => {
+                            chatItem.remove();
+                            // If we're on the deleted chat's page, redirect to home
+                            const currentPath = window.location.pathname;
+                            if (currentPath === `/chat/${chatId}/`) {
+                                window.location.href = '/chat/';
+                            }
+                        }, 300);
+                    } else {
+                        throw new Error('Failed to delete chat');
+                    }
+                } catch (error) {
+                    console.error('Error deleting chat:', error);
+                    // Show error toast
+                    const toastContainer = document.createElement('div');
+                    toastContainer.className = 'position-fixed bottom-0 end-0 p-3';
+                    toastContainer.style.zIndex = '1050';
+                    toastContainer.innerHTML = `
+                <div class="toast align-items-center text-white bg-danger border-0" role="alert">
+                    <div class="d-flex">
+                        <div class="toast-body">
+                            Failed to delete chat. Please try again.
+                        </div>
+                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                    </div>
+                </div>
+            `;
+                    document.body.appendChild(toastContainer);
+                    const toast = new bootstrap.Toast(toastContainer.querySelector('.toast'));
+                    toast.show();
+                    setTimeout(() => toastContainer.remove(), 3000);
+                }
+                deleteModal.hide();
+            };
+
+            // Set up one-time event listener for the confirm button
+            confirmDeleteBtn.onclick = () => {
+                performDelete();
+                confirmDeleteBtn.onclick = null; // Remove the event listener
+            };
+
+            // Show the modal
+            deleteModal.show();
+
+            // Clean up when modal is hidden
+            document.getElementById('deleteConfirmModal').addEventListener('hidden.bs.modal', () => {
+                confirmDeleteBtn.onclick = null;
+            }, { once: true });
+        }
+
+
+    </script>
+
+</body>
+
+</html>
