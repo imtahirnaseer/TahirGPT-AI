@@ -1090,11 +1090,11 @@
 
         }
 
-          .chat-container {
+        .chat-container {
             position: fixed;
-            top: 590px;
+            top: 500px;
             /* Default position */
-            right: 0.2vw;
+            right: 2vw;
             /* Adjusts dynamically */
             z-index: 999;
         }
@@ -1103,16 +1103,18 @@
 
             /* Adjust for smaller screens */
             .chat-container {
-                top: 86vh;
+                top: 75vh;
                 /* Auto-adjust based on viewport height */
             }
         }
 
         @media (max-height: 720px) {
             .chat-container {
-                top: 76vh;
+                top: 75vh;
             }
         }
+
+
         .chat-btn {
             width: 60px;
             height: 60px;
@@ -1158,6 +1160,7 @@
         .chat-card {
             position: fixed;
             bottom: 80px;
+            top: -10px;
             right: 2rem;
             border-radius: 10px;
             width: 410px;
